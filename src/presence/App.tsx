@@ -500,8 +500,19 @@ export function App() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setLoginError("");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setCurrentUserId(null);
+      setUsers([]);
+      setMyTeachingAssignments([]);
+      setNotificationCount(0);
+      setToast(null);
+      setView("dashboard");
+      setLoginError("");
+    } catch {
+      showToast("تعذّر تسجيل الخروج. يرجى المحاولة مرة أخرى.");
+    }
   };
 
   /* ------------------------------------------------------------

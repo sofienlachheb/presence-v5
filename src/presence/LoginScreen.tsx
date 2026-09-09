@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, GraduationCap, LoaderCircle, ShieldCheck } from "lucide-react";
 import schoolLogo from "../assets/school-logo.png";
 import schoolCampus from "../assets/school-campus.png";
@@ -7,10 +7,23 @@ import "./login.css";
 export function LoginScreen({ users, onLogin, error }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [editable, setEditable] = useState({ email: false, password: false });
   const [showPass, setShowPass] = useState(false);
   const [pending, setPending] = useState(false);
   const [localError, setLocalError] = useState("");
   const submitting = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    const clearCredentials = () => {
+      formRef.current?.reset();
+      formRef.current?.querySelectorAll("input").forEach(input => { input.value = ""; });
+      setEditable({ email: false, password: false });
+      setEmail(""); setPassword(""); setShowPass(false);
+    };
+    clearCredentials();
+    window.addEventListener("pageshow", clearCredentials);
+    return () => window.removeEventListener("pageshow", clearCredentials);
+  }, []);
   const submit = async (event) => {
     event.preventDefault();
     if (submitting.current || !email.trim() || !password) return;
@@ -29,11 +42,11 @@ export function LoginScreen({ users, onLogin, error }) {
           <span className="school-login-eyebrow">بوابتك إلى مجتمع المدرسة</span>
           <h1 id="login-heading">أهلًا بعودتك</h1>
           <p className="school-login-intro">سجّل دخولك لمتابعة يومك الدراسي،<br/>ودعم رحلة الطالب نحو النجاح.</p>
-          <form onSubmit={submit} aria-busy={pending}>
+          <form ref={formRef} onSubmit={submit} aria-busy={pending} autoComplete="off">
             <label htmlFor="school-login-email">البريد الإلكتروني</label>
-            <div className="school-login-input"><Mail size={19} aria-hidden="true"/><input id="school-login-email" name="email" type="email" dir="ltr" autoComplete="username" autoCapitalize="none" spellCheck={false} placeholder="name@school.qa" required value={email} onChange={e=>setEmail(e.target.value)} disabled={pending}/></div>
+            <div className="school-login-input"><Mail size={19} aria-hidden="true"/><input id="school-login-email" name="school-account" type="email" readOnly={!editable.email} onFocus={e => { if (!editable.email) { e.currentTarget.value = ""; setEmail(""); setEditable(v => ({ ...v, email: true })); } }} dir="ltr" autoComplete="off" autoCapitalize="none" spellCheck={false} placeholder="name@school.qa" required value={email} onChange={e=>setEmail(e.target.value)} disabled={pending}/></div>
             <label htmlFor="school-login-password">كلمة المرور</label>
-            <div className="school-login-input"><LockKeyhole size={19} aria-hidden="true"/><input id="school-login-password" name="password" type={showPass ? "text" : "password"} autoComplete="current-password" placeholder="أدخل كلمة المرور" required value={password} onChange={e=>setPassword(e.target.value)} disabled={pending} aria-describedby={message ? "school-login-error" : undefined}/><button type="button" className="school-login-eye" aria-label={showPass ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"} aria-pressed={showPass} onClick={()=>setShowPass(v=>!v)}>{showPass ? <EyeOff size={19}/> : <Eye size={19}/>}</button></div>
+            <div className="school-login-input"><LockKeyhole size={19} aria-hidden="true"/><input id="school-login-password" name="school-access-code" type={showPass ? "text" : "password"} autoComplete="new-password" readOnly={!editable.password} onFocus={e => { if (!editable.password) { e.currentTarget.value = ""; setPassword(""); setEditable(v => ({ ...v, password: true })); } }} placeholder="أدخل كلمة المرور" required value={password} onChange={e=>setPassword(e.target.value)} disabled={pending} aria-describedby={message ? "school-login-error" : undefined}/><button type="button" className="school-login-eye" aria-label={showPass ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"} aria-pressed={showPass} onClick={()=>setShowPass(v=>!v)}>{showPass ? <EyeOff size={19}/> : <Eye size={19}/>}</button></div>
             {message && <div id="school-login-error" className="school-login-error" role="alert">{message}</div>}
             <button className="school-login-submit" type="submit" disabled={pending}>{pending ? <><LoaderCircle className="school-login-spinner" size={20}/>جارٍ تسجيل الدخول…</> : <>تسجيل الدخول<ArrowLeft size={20}/></>}</button>
           </form>
