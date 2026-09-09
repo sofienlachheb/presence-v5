@@ -1,78 +1,54 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import {
-  Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
-  Search, Plus, X, Check, ChevronLeft, ChevronRight, Home, FileText,
-  Send, ShieldAlert, GraduationCap, CalendarDays, Phone, Activity,
-  ClipboardList, TrendingUp, Filter, Eye, Star, PenLine,
-  Printer, PlayCircle, History as HistoryIcon, Settings, UserPlus,
-  Trash2, Pencil, Lock, Mail, ShieldCheck, Save, Bird, MessageCircle, LogOut
-} from "lucide-react";
+import React, { useRef, useState } from "react";
+import { ArrowLeft, Eye, EyeOff, LockKeyhole, Mail, GraduationCap, LoaderCircle, ShieldCheck } from "lucide-react";
+import schoolLogo from "../assets/school-logo.png";
+import schoolCampus from "../assets/school-campus.png";
+import "./login.css";
 
-
-/* ---------------------------------------------------------------
-   شاشة تسجيل الدخول
---------------------------------------------------------------- */
 export function LoginScreen({ users, onLogin, error }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
-  const [showHint, setShowHint] = useState(false);
-
-  const submit = (e) => {
-    e?.preventDefault();
-    if (!email.trim() || !password.trim()) return;
-    onLogin(email, password);
+  const [pending, setPending] = useState(false);
+  const [localError, setLocalError] = useState("");
+  const submitting = useRef(false);
+  const submit = async (event) => {
+    event.preventDefault();
+    if (submitting.current || !email.trim() || !password) return;
+    submitting.current = true; setPending(true); setLocalError("");
+    try { await onLogin(email.trim(), password); }
+    catch { setLocalError("تعذّر الاتصال. يرجى المحاولة مرة أخرى."); }
+    finally { submitting.current = false; setPending(false); }
   };
-
-  return (
-    <div className="login-screen">
-      <div className="login-box">
-        <div className="login-brand">
-          <div className="brand-mark">
-            <ShieldAlert size={26} />
-          </div>
-          <div className="login-title">مدرسة عمر بن عبد العزيز الثانوية للبنين</div>
-          <div className="login-sub">النظام الإلكتروني لدعم الطالب والمعلم</div>
+  const message = localError || error;
+  return <main className="school-login" dir="rtl">
+    <header className="school-login-header"><img src={schoolLogo} alt="مدرسة عمر بن عبد العزيز الثانوية للبنين — وزارة التربية والتعليم والتعليم العالي"/><span>النظام الإلكتروني لدعم الطالب والمعلم</span></header>
+    <div className="school-login-layout">
+      <section className="school-login-form-panel" aria-labelledby="login-heading">
+        <div className="school-login-form-content">
+          <div className="school-login-mark"><GraduationCap size={29}/></div>
+          <span className="school-login-eyebrow">بوابتك إلى مجتمع المدرسة</span>
+          <h1 id="login-heading">أهلًا بعودتك</h1>
+          <p className="school-login-intro">سجّل دخولك لمتابعة يومك الدراسي،<br/>ودعم رحلة الطالب نحو النجاح.</p>
+          <form onSubmit={submit} aria-busy={pending}>
+            <label htmlFor="school-login-email">البريد الإلكتروني</label>
+            <div className="school-login-input"><Mail size={19} aria-hidden="true"/><input id="school-login-email" name="email" type="email" dir="ltr" autoComplete="username" autoCapitalize="none" spellCheck={false} placeholder="name@school.qa" required value={email} onChange={e=>setEmail(e.target.value)} disabled={pending}/></div>
+            <label htmlFor="school-login-password">كلمة المرور</label>
+            <div className="school-login-input"><LockKeyhole size={19} aria-hidden="true"/><input id="school-login-password" name="password" type={showPass ? "text" : "password"} autoComplete="current-password" placeholder="أدخل كلمة المرور" required value={password} onChange={e=>setPassword(e.target.value)} disabled={pending} aria-describedby={message ? "school-login-error" : undefined}/><button type="button" className="school-login-eye" aria-label={showPass ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"} aria-pressed={showPass} onClick={()=>setShowPass(v=>!v)}>{showPass ? <EyeOff size={19}/> : <Eye size={19}/>}</button></div>
+            {message && <div id="school-login-error" className="school-login-error" role="alert">{message}</div>}
+            <button className="school-login-submit" type="submit" disabled={pending}>{pending ? <><LoaderCircle className="school-login-spinner" size={20}/>جارٍ تسجيل الدخول…</> : <>تسجيل الدخول<ArrowLeft size={20}/></>}</button>
+          </form>
+          <p className="school-login-help">تحتاج مساعدة في الدخول؟ <span>تواصل مع مسؤول النظام في المدرسة.</span></p>
+          <div className="school-login-private"><ShieldCheck size={16}/><span>حسابك المدرسي، في مكان واحد</span></div>
         </div>
-
-        <form onSubmit={submit}>
-          <div className="field-label">البريد الإلكتروني</div>
-          <div className="input-with-icon">
-            <Mail size={16} />
-            <input
-              type="text"
-              className="text-input"
-              placeholder="name@school.qa"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoFocus
-            />
-          </div>
-
-          <div className="field-label">كلمة المرور</div>
-          <div className="input-with-icon">
-            <Lock size={16} />
-            <input
-              type={showPass ? "text" : "password"}
-              className="text-input"
-              placeholder="••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button type="button" className="show-pass-btn" onClick={() => setShowPass((v) => !v)}>
-              <Eye size={15} />
-            </button>
-          </div>
-
-          {error && <div className="login-error">{error}</div>}
-
-          <button type="submit" className="submit-btn" style={{ marginTop: 14 }} onClick={submit}>
-            <LogOut size={16} style={{ transform: "scaleX(-1)" }} /> تسجيل الدخول
-          </button>
-        </form>
-
-
-      </div>
+      </section>
+      <aside className="school-login-visual" aria-label="المجتمع المدرسي">
+        <img src={schoolCampus} alt="صورة توضيحية لحرم مدرسي بباحة واسعة وأشجار نخيل" fetchPriority="high"/>
+        <div className="school-login-visual-shade"/>
+        <div className="school-login-visual-top"><span>Presence</span><span>حضور يصنع أثرًا</span></div>
+        <div className="school-login-visual-copy"><span className="school-login-pill">نتعلّم · نشارك · نرتقي</span><h2>كل يوم دراسي،<br/>فرصة لأثر أجمل.</h2><p>مدرسة عمر بن عبد العزيز<br/>الثانوية للبنين</p></div>
+        
+      </aside>
     </div>
-  );
+    <footer className="school-login-footer"><span>مدرسة عمر بن عبد العزيز الثانوية للبنين</span><span>معًا لدعم الطالب والمعلم</span></footer>
+  </main>;
 }

@@ -1,3 +1,4 @@
+import { writeSchoolPrint } from "./schoolPrint";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "../supabaseClient";
 import {
@@ -166,7 +167,7 @@ export function AuditLogView({ currentUser }) {
 
     const w = window.open("", "_blank", "width=1200,height=850");
     if (!w) return;
-    w.document.write(`
+    writeSchoolPrint(w, `
       <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/>
       <title>سجل العمليات</title>
       <style>
@@ -192,10 +193,10 @@ export function AuditLogView({ currentUser }) {
         </tr></thead>
         <tbody>${rows || '<tr><td colspan="8">لا توجد سجلات</td></tr>'}</tbody>
       </table>
-      <script>window.onload=()=>setTimeout(()=>window.print(),250);<\/script>
+      
       </body></html>
     `);
-    w.document.close();
+
   };
 
   const exportCsv = () => {

@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useRef } from "react";
+import schoolLogo from "../assets/school-logo.png";
+import { writeSchoolPrint } from "./schoolPrint";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
   Search, Plus, X, Check, ChevronLeft, ChevronRight, Home, FileText,
@@ -10,6 +12,13 @@ import {
 
 
 export function PrintPledgeModal({ pledge, violations, onClose }) {
+  const printContent = useRef<HTMLDivElement>(null);
+  const printPledge = () => {
+    if (!printContent.current) return;
+    const w = window.open("", "_blank", "width=980,height=800");
+    if (!w) return;
+    writeSchoolPrint(w, `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>تعهد</title><style>@page{size:A4;margin:13mm}body{font-family:Tahoma,Arial,sans-serif;color:#111;margin:0}.pledge-preview-logo{display:none}</style></head><body>${printContent.current.innerHTML}</body></html>`);
+  };
   const related = violations.filter((v) => v.studentId === pledge.studentId && (!pledge.violationRef || v.item === pledge.violationRef));
   const latest = related[0] || null;
   const repeat = latest ? violations.filter((v) => v.studentId === pledge.studentId && v.item === latest.item).length : 0;
@@ -21,9 +30,9 @@ export function PrintPledgeModal({ pledge, violations, onClose }) {
           <h4><PenLine size={16} /> {pledge.type === "طالب" ? "تعهد طالب" : "تعهد ولي أمر"}</h4>
           <button className="icon-btn" onClick={onClose}><X size={16} /></button>
         </div>
-        <div className="modal-body pledge-print" style={{ direction: "rtl", background: "white", color: "#111" }}>
+        <div ref={printContent} className="modal-body pledge-print" style={{ direction: "rtl", background: "white", color: "#111" }}>
           <div style={{ border: "2px solid #222", padding: 12, position: "relative", marginBottom: 8 }}>
-            <div style={{ position: "absolute", right: 18, top: 12, width: 62, height: 62, border: "2px solid #8d1734", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center", fontSize: 9, fontWeight: 800 }}>شعار<br/>المدرسة</div>
+            <img className="pledge-preview-logo" src={schoolLogo} alt="شعار المدرسة" style={{ display: "block", width: "100%", height: 84, objectFit: "contain", marginBottom: 12 }}/>
             <div style={{ textAlign: "center", fontSize: 18, fontWeight: 900, textDecoration: "underline" }}>مدرسة عمر بن عبد العزيز الثانوية للبنين</div>
             <div style={{ textAlign: "center", fontSize: 22, fontWeight: 900, marginTop: 9 }}>{pledge.type === "طالب" ? "تعهد طالب" : "تعهد ولي أمر"}</div>
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 7, fontWeight: 700, fontSize: 12 }}><span>رقم المخالفة: {latest?.id || "—"}</span><span>التاريخ: {pledge.date}</span></div>
@@ -45,7 +54,7 @@ export function PrintPledgeModal({ pledge, violations, onClose }) {
           </div>
         </div>
         <div className="modal-foot no-print">
-          <button className="submit-btn" style={{ margin: 0 }} onClick={() => window.print()}><Printer size={15} /> طباعة</button>
+          <button className="submit-btn" style={{ margin: 0 }} onClick={printPledge}><Printer size={15} /> طباعة</button>
         </div>
       </div>
     </div>

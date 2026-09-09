@@ -1,3 +1,4 @@
+import { writeSchoolPrint } from "./schoolPrint";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -64,7 +65,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
         </tr>`
       )
       .join("");
-    w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/>
+    writeSchoolPrint(w, `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/>
       <title>${title}</title>
       <style>
         @page{size:A4;margin:13mm} *{box-sizing:border-box}
@@ -83,8 +84,8 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
           <thead><tr><th>الطالب</th><th>الصف/الشعبة</th><th>الحصة</th><th>الحالة</th><th>الوقت</th><th>سجّله</th></tr></thead>
           <tbody>${bodyRows}</tbody>
         </table>
-      </div><script>window.onload=()=>setTimeout(()=>window.print(),200);<\/script></body></html>`);
-    w.document.close();
+      </div></body></html>`);
+
   };
 
   return (

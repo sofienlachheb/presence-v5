@@ -1,3 +1,4 @@
+import { writeSchoolPrint } from "./schoolPrint";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -129,7 +130,7 @@ export function EvaluationView({ students, evaluations, addEvaluation, sendHudhu
         `).join("")
       : `<tr><td colspan="7">لا توجد تقييمات مطابقة للفلاتر المحددة</td></tr>`;
 
-    w.document.write(`
+    writeSchoolPrint(w, `
       <!doctype html>
       <html lang="ar" dir="rtl">
       <head>
@@ -167,14 +168,12 @@ export function EvaluationView({ students, evaluations, addEvaluation, sendHudhu
           </thead>
           <tbody>${rows}</tbody>
         </table>
-        <script>
-          window.onload = () => setTimeout(() => window.print(), 200);
-        <\/script>
+        
       </body>
       </html>
     `);
 
-    w.document.close();
+
   };
 
   const sendEvaluationToGuardian = async (evaluation) => {

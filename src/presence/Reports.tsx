@@ -1,3 +1,4 @@
+import { writeSchoolPrint } from "./schoolPrint";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -163,7 +164,7 @@ export function Reports({ violations, students, attendance, classes, users, curr
   const printHtml = (title, body) => {
     const w = window.open("", "_blank", "width=1100,height=850");
     if (!w) return;
-    w.document.write(`
+    writeSchoolPrint(w, `
       <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/>
       <title>${esc(title)}</title>
       <style>
@@ -189,10 +190,10 @@ export function Reports({ violations, students, attendance, classes, users, curr
         <span>مجموع المخالفات: ${filteredViolations.length}</span>
       </div>
       ${body}
-      <script>window.onload=()=>setTimeout(()=>window.print(),200);<\/script>
+      
       </body></html>
     `);
-    w.document.close();
+
   };
 
   const printCurrentReport = () => {

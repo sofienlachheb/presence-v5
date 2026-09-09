@@ -1,5 +1,5 @@
+import { writeSchoolPrint } from "./schoolPrint";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import schoolLogo from "../assets/school-logo.png";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
   Search, Plus, X, Check, ChevronLeft, ChevronRight, Home, FileText,
@@ -304,11 +304,11 @@ export function StudentComprehensiveProfile({
     const rowsOrEmpty = (rows, cols) =>
       rows.length ? rows.join("") : `<tr><td colspan="${cols}" class="empty">لا توجد بيانات مسجلة</td></tr>`;
 
-    const logoSrc = schoolLogo;
+
     const w = window.open("", "_blank", "width=1100,height=850");
     if (!w) return;
 
-    w.document.write(`<!doctype html>
+    writeSchoolPrint(w, `<!doctype html>
     <html lang="ar" dir="rtl">
     <head>
       <meta charset="utf-8">
@@ -347,9 +347,7 @@ export function StudentComprehensiveProfile({
       </style>
     </head>
     <body>
-      <div class="header">
-        <img class="logo" src="${logoSrc}" alt="شعار المدرسة ووزارة التربية والتعليم والتعليم العالي">
-      </div>
+
 
       <div class="title">التقرير الشامل للطالب</div>
       <div class="subtitle">مدرسة عمر بن عبد العزيز الثانوية للبنين — تاريخ إصدار التقرير: ${esc(new Date().toLocaleDateString("ar-QA"))}</div>
@@ -435,8 +433,8 @@ export function StudentComprehensiveProfile({
       <div class="footer">تقرير صادر من نظام Presence — مدرسة عمر بن عبد العزيز الثانوية للبنين</div>
     </body></html>`);
 
-    w.document.close();
-    setTimeout(() => w.print(), 450);
+
+
   };
   const T = ({ h, r }) => (
     <div style={{ overflowX: "auto" }}>

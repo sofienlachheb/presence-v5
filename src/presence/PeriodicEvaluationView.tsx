@@ -1,3 +1,4 @@
+import { writeSchoolPrint } from "./schoolPrint";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -175,7 +176,7 @@ export function PeriodicEvaluationView({
     const w = window.open("", "_blank", "width=1000,height=800");
     if (!w) return;
 
-    w.document.write(`
+    writeSchoolPrint(w, `
       <!doctype html>
       <html lang="ar" dir="rtl">
       <head>
@@ -239,11 +240,11 @@ export function PeriodicEvaluationView({
         <div class="section">ملاحظات المعلم</div>
         <div class="note">${esc(e.teacherNote || "لا توجد ملاحظات")}</div>
 
-        <script>window.onload=()=>setTimeout(()=>window.print(),200);<\/script>
+        
       </body>
       </html>
     `);
-    w.document.close();
+
   };
 
   const printFiltered = () => {
@@ -269,7 +270,7 @@ export function PeriodicEvaluationView({
           .join("")
       : `<tr><td colspan="9">لا توجد تقييمات مطابقة</td></tr>`;
 
-    w.document.write(`
+    writeSchoolPrint(w, `
       <!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/>
       <title>سجل التقييمات الدورية</title>
       <style>
@@ -286,10 +287,10 @@ export function PeriodicEvaluationView({
         <th>م</th><th>التاريخ</th><th>الطالب</th><th>الصف</th><th>المادة</th>
         <th>الفترة</th><th>الأكاديمي</th><th>السلوكي</th><th>العام</th>
       </tr></thead><tbody>${rows}</tbody></table>
-      <script>window.onload=()=>setTimeout(()=>window.print(),200);<\/script>
+      
       </body></html>
     `);
-    w.document.close();
+
   };
 
   const sendToGuardian = async (e) => {

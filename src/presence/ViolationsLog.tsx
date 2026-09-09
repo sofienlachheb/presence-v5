@@ -1,3 +1,4 @@
+import { writeSchoolPrint } from "./schoolPrint";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -60,7 +61,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
   const openPrintWindow = (title, bodyHtml) => {
     const w = window.open("", "_blank", "width=980,height=760");
     if (!w) return;
-    w.document.write(`<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/>
+    writeSchoolPrint(w, `<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"/>
       <title>${esc(title)}</title>
       <style>
         @page{size:A4;margin:13mm} *{box-sizing:border-box}
@@ -74,15 +75,15 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
         .actions td{height:28px}.actions .n{width:42px;text-align:center;font-weight:800}.sign-row{display:flex;justify-content:space-between;gap:25px;margin-top:30px;text-align:center;font-weight:700}.sign{flex:1}.dots{display:block;margin-top:14px;letter-spacing:2px}
         .note{font-size:11px;margin-top:10px}.check{font-size:16px}.strong{font-weight:900}.center{text-align:center}
         @media print{body{font-size:12px}.sheet{max-width:none}.no-print{display:none!important}}
-      </style></head><body><div class="sheet">${bodyHtml}</div><script>window.onload=()=>setTimeout(()=>window.print(),200);<\/script></body></html>`);
-    w.document.close();
+      </style></head><body><div class="sheet">${bodyHtml}</div></body></html>`);
+
   };
 
   const printIncidentReport = (v) => {
     const count = repeatCount(v);
     openPrintWindow("إثبات واقعة", `
       <div class="doc-head">
-        <div class="emblem">شعار<br/>المدرسة</div>
+        
         <div class="school">مدرسة عمر بن عبد العزيز الثانوية للبنين</div>
         <div class="doc-title">إثبات واقعة</div>
         <div class="head-meta"><span>رقم الواقعة: ${esc(v.id)}</span><span>التاريخ: ${esc(v.date)}</span></div>
@@ -105,7 +106,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
     const actions = ["عمل إثبات واقعة", "التنبيه الشفوي", "تنبيه كتابي", "إشعار ولي الأمر", "استدعاء ولي الأمر", "تحويل إلى الأخصائي الاجتماعي"];
     openPrintWindow("تحويل إلى الأخصائي الاجتماعي", `
       <div class="doc-head">
-        <div class="emblem">شعار<br/>المدرسة</div>
+        
         <div class="school">مدرسة عمر بن عبد العزيز الثانوية للبنين</div>
         <div class="doc-title" style="font-size:16px">تحويل من المرشد الطلابي إلى الأخصائي الاجتماعي</div>
         <div class="head-meta"><span>رقم المخالفة: ${esc(v.id)}</span><span>التاريخ: ${esc(v.date)}</span></div>
@@ -151,7 +152,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
 
     openPrintWindow("سجل المخالفات", `
       <div class="doc-head">
-        <div class="emblem">شعار<br/>المدرسة</div>
+        
         <div class="school">مدرسة عمر بن عبد العزيز الثانوية للبنين</div>
         <div class="doc-title">سجل المخالفات</div>
         <div class="head-meta">
