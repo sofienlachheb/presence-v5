@@ -1,0 +1,173 @@
+{
+  "inputBytes": 623819,
+  "modules": 40,
+  "syntaxErrors": 0,
+  "circularDependencies": 0,
+  "preservedDeclarationCharacters": 589867,
+  "files": [
+    {
+      "file": "src/presence/shared.tsx",
+      "bytes": 19600
+    },
+    {
+      "file": "src/presence/SeverityGauge.tsx",
+      "bytes": 839
+    },
+    {
+      "file": "src/presence/Avatar.tsx",
+      "bytes": 235
+    },
+    {
+      "file": "src/presence/HealthDot.tsx",
+      "bytes": 327
+    },
+    {
+      "file": "src/presence/App.tsx",
+      "bytes": 77683
+    },
+    {
+      "file": "src/presence/LoginScreen.tsx",
+      "bytes": 3441
+    },
+    {
+      "file": "src/presence/Header.tsx",
+      "bytes": 3055
+    },
+    {
+      "file": "src/presence/SideNav.tsx",
+      "bytes": 3505
+    },
+    {
+      "file": "src/presence/Dashboard.tsx",
+      "bytes": 47964
+    },
+    {
+      "file": "src/presence/StatCard.tsx",
+      "bytes": 415
+    },
+    {
+      "file": "src/presence/EmptyState.tsx",
+      "bytes": 126
+    },
+    {
+      "file": "src/presence/AttendanceView.tsx",
+      "bytes": 6930
+    },
+    {
+      "file": "src/presence/AttendanceLogTab.tsx",
+      "bytes": 7024
+    },
+    {
+      "file": "src/presence/ViolationsEntry.tsx",
+      "bytes": 10296
+    },
+    {
+      "file": "src/presence/ViolationsLog.tsx",
+      "bytes": 19482
+    },
+    {
+      "file": "src/presence/PledgesView.tsx",
+      "bytes": 6470
+    },
+    {
+      "file": "src/presence/PrintPledgeModal.tsx",
+      "bytes": 4314
+    },
+    {
+      "file": "src/presence/VideoReportView.tsx",
+      "bytes": 3626
+    },
+    {
+      "file": "src/presence/EvaluationView.tsx",
+      "bytes": 18347
+    },
+    {
+      "file": "src/presence/PeriodicEvaluationView.tsx",
+      "bytes": 23184
+    },
+    {
+      "file": "src/presence/HudhudView.tsx",
+      "bytes": 9893
+    },
+    {
+      "file": "src/presence/ParentAcknowledgementCenter.tsx",
+      "bytes": 9545
+    },
+    {
+      "file": "src/presence/ParentPortal.tsx",
+      "bytes": 24763
+    },
+    {
+      "file": "src/presence/MessageModal.tsx",
+      "bytes": 2029
+    },
+    {
+      "file": "src/presence/StudentComprehensiveProfile.tsx",
+      "bytes": 46219
+    },
+    {
+      "file": "src/presence/NotificationTaskCenter.tsx",
+      "bytes": 6465
+    },
+    {
+      "file": "src/presence/CounselorDashboard.tsx",
+      "bytes": 16523
+    },
+    {
+      "file": "src/presence/EarlyWarningCenter.tsx",
+      "bytes": 7345
+    },
+    {
+      "file": "src/presence/UnifiedStudentFile.tsx",
+      "bytes": 4998
+    },
+    {
+      "file": "src/presence/DataManagementCenter.tsx",
+      "bytes": 15755
+    },
+    {
+      "file": "src/presence/AuditLogView.tsx",
+      "bytes": 14917
+    },
+    {
+      "file": "src/presence/CaseManagementCenter.tsx",
+      "bytes": 15192
+    },
+    {
+      "file": "src/presence/SmartAnalyticsCenter.tsx",
+      "bytes": 152011
+    },
+    {
+      "file": "src/presence/Reports.tsx",
+      "bytes": 26406
+    },
+    {
+      "file": "src/presence/StudentsView.tsx",
+      "bytes": 14482
+    },
+    {
+      "file": "src/presence/StudentModal.tsx",
+      "bytes": 4579
+    },
+    {
+      "file": "src/presence/PeriodManager.tsx",
+      "bytes": 2172
+    },
+    {
+      "file": "src/presence/SettingsView.tsx",
+      "bytes": 7671
+    },
+    {
+      "file": "src/presence/UserModal.tsx",
+      "bytes": 7784
+    },
+    {
+      "file": "src/presence/Toast.tsx",
+      "bytes": 629
+    }
+  ],
+  "declarationsPreservedExactly": 66,
+  "transpileErrors": 0,
+  "internalModulePathsVerified": true,
+  "runtimeTest": "Not run: original project dependencies, assets and Supabase configuration were not supplied."
+}

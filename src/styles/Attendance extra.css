@@ -1,0 +1,14 @@
+/* ---- Attendance: draft indicator, filters, log table ---- */
+      .unsaved-dot{
+        width:8px; height:8px; border-radius:50%; background:#D9A62E;
+        margin-inline-start:4px; flex-shrink:0;
+        box-shadow:0 0 0 3px rgba(217,166,46,0.2);
+      }
+      .attendance-filters{
+        display:grid; grid-template-columns:repeat(4, 1fr) auto; gap:10px;
+        align-items:end; margin-bottom:16px;
+      }
+      .att-log-table-wrap{ overflow-x:auto; }
+      @media (max-width: 880px){
+        .attendance-filters{ grid-template-columns:1fr 1fr; }
+      }

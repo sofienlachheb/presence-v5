@@ -1,0 +1,71 @@
+/* Maroon identity inspired by Qatar. Load AFTER the existing stylesheets. */
+:root {
+  --presence-maroon: #8a1538;
+  --presence-maroon-dark: #68102a;
+  --presence-maroon-soft: #f7edf0;
+  --presence-maroon-border: #dfbec8;
+  --presence-focus: #b64b6a;
+}
+@media screen {
+  .app-root { background-color: #faf7f8; }
+  .app-root .app-header {
+    background: var(--presence-maroon);
+    color: #fff;
+    border-bottom-color: var(--presence-maroon-dark);
+  }
+  .app-header .brand-name, .app-header .user-badge-name { color: #fff; }
+  .app-header .brand-sub, .app-header .user-badge-role { color: #f4dce3; }
+  .app-header .brand-mark { background: #fff; color: var(--presence-maroon); }
+  .app-header .date-switcher, .app-header .user-badge {
+    background: var(--presence-maroon-dark); color: #fff; border-color: #b45b74;
+  }
+  .app-header .date-display, .app-header .icon-btn,
+  .app-header .notification-bell { color: #fff; background: transparent; }
+  .app-header .icon-btn:hover, .app-header .notification-bell:hover {
+    background: #a33453;
+  }
+  .login-screen {
+    background: radial-gradient(ellipse at top right, #ad3b5d 0%, #8a1538 42%, #4e0c20 100%);
+  }
+  .login-screen .login-box { background: #fff; border-color: var(--presence-maroon-border); }
+  .login-screen .brand-mark { background: var(--presence-maroon); color: #fff; }
+  .login-screen .login-title { color: var(--presence-maroon); }
+  .login-screen .login-hint-toggle { color: var(--presence-maroon); }
+  :is(.app-root, .login-screen) .submit-btn,
+  .app-root .chip-btn, .app-root .today-btn,
+  .app-root .page-num-btn-active {
+    background: var(--presence-maroon); color: #fff; border-color: var(--presence-maroon);
+  }
+  :is(.app-root, .login-screen) .submit-btn:hover:not(:disabled),
+  .app-root .chip-btn:hover:not(:disabled), .app-root .today-btn:hover:not(:disabled) {
+    background: var(--presence-maroon-dark); border-color: var(--presence-maroon-dark);
+  }
+  .app-root .chip-btn-outline, .app-root .link-btn {
+    color: var(--presence-maroon); border-color: var(--presence-maroon-border);
+  }
+  .app-root .chip-btn-outline { background: #fff; }
+  .app-root .chip-btn-outline:hover:not(:disabled) { background: var(--presence-maroon-soft); }
+  .app-root .settings-tab-active, .app-root .class-tab-active,
+  .app-root .student-pick-active, .app-root .report-type-card-active {
+    background: var(--presence-maroon-soft); color: var(--presence-maroon);
+    border-color: var(--presence-maroon); box-shadow: none;
+  }
+  .app-root .card-head h3, .app-root .periodic-section-title { color: var(--presence-maroon); }
+  .app-root .parent-portal-hero, .app-root .student-profile-hero,
+  .app-root .student-file-hero {
+    background: var(--presence-maroon-soft); color: #431826;
+    border-color: var(--presence-maroon-border);
+  }
+  :is(.app-root, .login-screen) :is(input, select, textarea):focus {
+    border-color: var(--presence-maroon);
+    box-shadow: 0 0 0 3px var(--presence-maroon-soft);
+  }
+  :is(.app-root, .login-screen) :is(button, a, input, select, textarea):focus-visible {
+    outline: 3px solid var(--presence-focus); outline-offset: 3px;
+  }
+  :is(.app-root, .login-screen) input:is([type="checkbox"], [type="radio"]) {
+    accent-color: var(--presence-maroon);
+  }
+  :is(.app-root, .login-screen) ::selection { background: #dfbec8; color: #431826; }
+}
+

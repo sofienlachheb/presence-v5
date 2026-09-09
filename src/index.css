@@ -1,0 +1,27 @@
+:root {
+  --font-cairo: "Segoe UI", Tahoma, Arial, sans-serif;
+  font-family: var(--font-cairo);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  direction: rtl;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
