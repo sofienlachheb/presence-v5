@@ -1,3 +1,4 @@
+import "./user-modal.css";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -9,11 +10,15 @@ import {
 } from "lucide-react";
 
 
+const teachingSubjects = ["اللغة العربية", "اللغة الإنجليزية", "الشرعية", "الحاسوب", "الرياضيات", "الفيزياء", "الكيمياء", "الأحياء", "تاريخ", "جغرافيا", "اجتماعيات", "مهارات حياتية"];
+
 export function UserModal({ user, roles, students, classes, sections, onClose, onSave, onResetPassword }) {
   const [name, setName] = useState(user?.name || "");
   const [email, setEmail] = useState(user?.email || "");
   const [phone, setPhone] = useState(user?.phone || "");
   const [role, setRole] = useState(user?.role || roles[0] || "");
+  const [teachingSubject, setTeachingSubject] = useState(user?.teachingSubject || "");
+  const [customSubject, setCustomSubject] = useState(!!user?.teachingSubject && !teachingSubjects.includes(user.teachingSubject));
   const [active, setActive] = useState(user ? user.active : true);
   const [password, setPassword] = useState("");
   const [childIds, setChildIds] = useState(user?.childStudentIds || []);
@@ -29,7 +34,7 @@ export function UserModal({ user, roles, students, classes, sections, onClose, o
     role &&
     email.trim() &&
     (user || password.trim()) &&
-    (!isTeacher || teachingAssignmentKeys.length > 0);
+    (!isTeacher || (teachingAssignmentKeys.length > 0 && teachingSubject.trim().length > 0));
 
   const toggleChild = (id) => {
     setChildIds((prev) => (prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]));
@@ -46,11 +51,11 @@ export function UserModal({ user, roles, students, classes, sections, onClose, o
   );
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+    <div className="modal-backdrop user-modal-backdrop" onClick={onClose}>
+      <div className="modal-box user-modal" role="dialog" aria-modal="true" aria-labelledby="user-modal-title" onClick={(e) => e.stopPropagation()}>
         <div className="modal-head">
-          <h4><UserPlus size={16} /> {user ? "تعديل مستخدم" : "إضافة مستخدم جديد"}</h4>
-          <button className="icon-btn" onClick={onClose}><X size={16} /></button>
+          <h4 id="user-modal-title"><UserPlus size={16} /> {user ? "تعديل مستخدم" : "إضافة مستخدم جديد"}</h4>
+          <button className="icon-btn" aria-label="إغلاق" onClick={onClose}><X size={16} /></button>
         </div>
         <div className="modal-body">
           <div className="field-label">الاسم</div>
@@ -95,6 +100,16 @@ export function UserModal({ user, roles, students, classes, sections, onClose, o
             ))}
           </select>
 
+          {isTeacher && <div className="user-subject-field">
+            <label className="field-label" htmlFor="teacher-subject">المادة التي يدرسها المعلم <span aria-hidden="true">*</span></label>
+            <select id="teacher-subject" className="select-input" value={customSubject ? "other" : teachingSubject} onChange={e => { setCustomSubject(e.target.value === "other"); setTeachingSubject(e.target.value === "other" ? "" : e.target.value); }}>
+              <option value="">اختر المادة</option>
+              {teachingSubjects.map(subject => <option key={subject} value={subject}>{subject}</option>)}
+              <option value="other">مادة أخرى</option>
+            </select>
+            {customSubject && <input className="text-input" aria-label="اسم المادة الأخرى" value={teachingSubject} maxLength={100} onChange={e => setTeachingSubject(e.target.value)} placeholder="اكتب اسم المادة" />}
+            <p className="char-hint">تظهر تلقائيًا في التقييم الدوري ونقاط الحصة.</p>
+          </div>}
           {isTeacher && (
             <>
               <div className="field-label">
@@ -155,6 +170,10 @@ export function UserModal({ user, roles, students, classes, sections, onClose, o
             </label>
           )}
 
+        </div>
+        <div className="user-modal-footer">
+          {!canSave && <p className="char-hint" role="status">أكمل الاسم والبريد الإلكتروني{!user && " وكلمة المرور"}{isTeacher && " وحدد المادة وصفًا/شعبة واحدة على الأقل"} لتفعيل الحفظ.</p>}
+          <div className="user-modal-actions">
           <button
             className="submit-btn"
             disabled={!canSave}
@@ -166,6 +185,7 @@ export function UserModal({ user, roles, students, classes, sections, onClose, o
                 role,
                 active,
                 password: password.trim(),
+                teachingSubject: isTeacher ? teachingSubject.trim() : null,
                 childStudentIds: isGuardian ? childIds : undefined,
                 teachingAssignments: isTeacher
                   ? teachingAssignmentKeys.map((key) => {
@@ -176,8 +196,10 @@ export function UserModal({ user, roles, students, classes, sections, onClose, o
               })
             }
           >
-            <Save size={16} /> حفظ
+            <Save size={16} /> {user ? "حفظ التعديلات" : "إضافة مستخدم جديد"}
           </button>
+          <button type="button" className="chip-btn-outline" onClick={onClose}>إلغاء</button>
+          </div>
         </div>
       </div>
     </div>

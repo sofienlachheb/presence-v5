@@ -33,7 +33,7 @@ export function PeriodicEvaluationView({
   const [selectedClass, setSelectedClass] = useState("");
   const [studentSearch, setStudentSearch] = useState("");
   const [student, setStudent] = useState(null);
-  const [subject, setSubject] = useState("");
+  const subject = String(currentUser?.teachingSubject || "").trim();
   const [evaluationPeriod, setEvaluationPeriod] = useState(PERIODIC_PERIODS[0]);
   const [academicScores, setAcademicScores] = useState({});
   const [behaviorScores, setBehaviorScores] = useState({});
@@ -56,15 +56,6 @@ export function PeriodicEvaluationView({
     [students]
   );
 
-  const subjects = useMemo(
-    () =>
-      [...new Set(
-        (evaluations || [])
-          .map((e) => String(e.subject || "").trim())
-          .filter(Boolean)
-      )],
-    [evaluations]
-  );
 
   const studentsForSelectedClass = useMemo(() => {
     if (!isTeacher) return students || [];
@@ -135,10 +126,11 @@ export function PeriodicEvaluationView({
 
   const filteredEvaluations = useMemo(() => {
     const qName = filterName.trim();
-    const qSubject = filterSubject.trim();
+    const qSubject = isTeacher ? "" : filterSubject.trim();
 
     return (evaluations || []).filter(
       (e) =>
+        (!isTeacher || (!!subject && e.teacherId === currentUser.id && String(e.subject || "").trim() === subject)) &&
         (filterClass === "الكل" || String(e.class || "") === filterClass) &&
         (!qName || String(e.studentName || "").includes(qName)) &&
         (!qSubject || String(e.subject || "").includes(qSubject)) &&
@@ -151,7 +143,7 @@ export function PeriodicEvaluationView({
     filterName,
     filterSubject,
     filterPeriod,
-    filterDate,
+    filterDate, isTeacher, subject, currentUser?.id,
   ]);
 
   const esc = (value) =>
@@ -240,7 +232,7 @@ export function PeriodicEvaluationView({
         <div class="section">ملاحظات المعلم</div>
         <div class="note">${esc(e.teacherNote || "لا توجد ملاحظات")}</div>
 
-        
+
       </body>
       </html>
     `);
@@ -287,7 +279,7 @@ export function PeriodicEvaluationView({
         <th>م</th><th>التاريخ</th><th>الطالب</th><th>الصف</th><th>المادة</th>
         <th>الفترة</th><th>الأكاديمي</th><th>السلوكي</th><th>العام</th>
       </tr></thead><tbody>${rows}</tbody></table>
-      
+
       </body></html>
     `);
 
@@ -316,6 +308,7 @@ export function PeriodicEvaluationView({
 
   return (
     <div className="view-stack">
+      {isTeacher && !subject && <p role="alert">لم تُحدد مادتك بعد. يرجى مراجعة مسؤول النظام لتحديدها في إعدادات حسابك.</p>}
       {isTeacher && (
         <div className="two-col two-col-narrow">
           <section className="card">
@@ -386,8 +379,8 @@ export function PeriodicEvaluationView({
                     <input
                       className="text-input"
                       value={subject}
-                      onChange={(e) => setSubject(e.target.value)}
-                      placeholder="مثال: الرياضيات"
+                      readOnly
+                      placeholder="يرجى تحديد المادة بواسطة مسؤول النظام"
                     />
                   </div>
                   <div style={{ flex: 1 }}>
@@ -511,8 +504,10 @@ export function PeriodicEvaluationView({
 
           <input
             className="text-input select-inline"
-            placeholder="المادة..."
-            value={filterSubject}
+            placeholder={isTeacher ? "لم تُحدد مادتك — راجع مسؤول النظام" : "المادة..."}
+            aria-label="المادة"
+            readOnly={isTeacher}
+            value={isTeacher ? subject : filterSubject}
             onChange={(e) => setFilterSubject(e.target.value)}
           />
 

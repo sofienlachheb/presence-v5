@@ -387,6 +387,7 @@ export function App() {
           phone: p.phone,
           role: p.role,
           active: p.active,
+          teachingSubject: p.teaching_subject || "",
           childStudentIds: childrenByGuardian[p.id] || [],
           teachingAssignments: classesByTeacher[p.id] || [],
         }))
@@ -624,6 +625,8 @@ const addUser = async (data) => {
     }
 
     if (data.role === "معلم") {
+      const { error: subjectError } = await supabase.from("profiles").update({ teaching_subject: data.teachingSubject.trim() }).eq("id", result.user.id);
+      if (subjectError) { showToast("تم إنشاء الحساب، لكن تعذّر حفظ المادة. حدّدها من تعديل المستخدم بعد تطبيق ترحيل المرحلة 23."); await loadAllData(currentUserId); return; }
       const ok = await syncTeacherClasses(result.user.id, data.teachingAssignments || []);
       if (!ok) return;
     }
@@ -635,6 +638,7 @@ const addUser = async (data) => {
       phone: data.phone,
       role: data.role,
       active: data.active,
+      teachingSubject: data.role === "معلم" ? data.teachingSubject.trim() : "",
       childStudentIds: data.childStudentIds || [],
       teachingAssignments: data.role === "معلم" ? (data.teachingAssignments || []) : [],
     };
@@ -654,7 +658,7 @@ const addUser = async (data) => {
   const updateUser = async (id, patch) => {
     const { error } = await supabase
       .from("profiles")
-      .update({ name: patch.name, phone: patch.phone, role: patch.role, active: patch.active })
+      .update({ name: patch.name, phone: patch.phone, role: patch.role, active: patch.active, teaching_subject: patch.role === "معلم" ? String(patch.teachingSubject || "").trim() : null })
       .eq("id", id);
     if (error) {
       showToast("تعذّر تحديث بيانات المستخدم");
@@ -1237,6 +1241,8 @@ const addUser = async (data) => {
       return null;
     }
 
+    const teacherSubject = String(currentUser.teachingSubject || "").trim();
+    if (!teacherSubject) { showToast("يرجى تحديد مادة المعلم في إعدادات المستخدمين أولًا"); return null; }
     const allowed = accessibleStudents.some((s) => s.id === studentId);
     if (!allowed) {
       showToast("لا يمكنك تقييم طالب خارج صفوفك");
@@ -1272,7 +1278,7 @@ const addUser = async (data) => {
       .insert({
         student_id: studentId,
         teacher_id: currentUser.id,
-        subject: subject.trim(),
+        subject: teacherSubject,
         evaluation_period: evaluationPeriod,
         date: selectedDate,
         academic_scores: academicScores,

@@ -71,7 +71,7 @@ export function SettingsView({ users, roles, students, addUser, updateUser, dele
                   <span className="count-chip" style={{ background: "#5B8DEF" }}>{u.role}</span>
                   {u.role === "معلم" && (
                     <span className="count-chip" style={{ background: "#2F9E6E" }}>
-                      {(u.teachingAssignments || []).length} صف/شعبة
+                      {u.teachingSubject || "المادة غير محددة"} · {(u.teachingAssignments || []).length} صف/شعبة
                     </span>
                   )}
                   {!u.active && <span className="count-chip" style={{ background: "#9AA3AF" }}>موقوف</span>}
