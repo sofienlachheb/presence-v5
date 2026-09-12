@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export function ChangePasswordForm({ onChangePassword, onBusyChange }) {
+export function ChangePasswordForm({ onChangePassword, onBusyChange, onSuccess }) {
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [busy, setBusy] = useState(false);
@@ -16,13 +16,14 @@ export function ChangePasswordForm({ onChangePassword, onBusyChange }) {
       await onChangePassword(password);
       setPassword("");
       setConfirmation("");
-      setMessage("تم تغيير كلمة المرور بنجاح");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "تعذّر تغيير كلمة المرور، حاول مجدداً");
+      return;
     } finally {
       setBusy(false);
       onBusyChange(false);
     }
+    onSuccess();
   };
 
   return <fieldset disabled={busy} style={{ border: 0, padding: 0, margin: "12px 0" }}>

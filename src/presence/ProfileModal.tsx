@@ -22,7 +22,7 @@ export function ProfileModal({ user, onClose }) {
       <h3>{user.name}</h3>
       <p>{roleLabel(user.role)}</p>
       <p dir="ltr" style={{ overflowWrap: "anywhere" }}>{user.email}</p>
-      <ChangePasswordForm onChangePassword={password => changeOwnPassword(supabase.auth, password)} onBusyChange={setBusy} />
+      <ChangePasswordForm onChangePassword={password => changeOwnPassword(supabase.auth, password)} onBusyChange={setBusy} onSuccess={onClose} />
     </div>
   </dialog>;
 }
