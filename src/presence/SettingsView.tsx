@@ -1,3 +1,4 @@
+import { roleLabel } from "./roleLabels";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -68,7 +69,7 @@ export function SettingsView({ users, roles, students, addUser, updateUser, dele
                   <span className="mini-list-desc">
                     <Mail size={11} style={{ verticalAlign: "-1px" }} /> {u.email || "—"} &nbsp;·&nbsp; {u.phone || "—"}
                   </span>
-                  <span className="count-chip" style={{ background: "#5B8DEF" }}>{u.role}</span>
+                  <span className="count-chip" style={{ background: "#5B8DEF" }}>{roleLabel(u.role)}</span>
                   {u.role === "معلم" && (
                     <span className="count-chip" style={{ background: "#2F9E6E" }}>
                       {u.teachingSubject || "المادة غير محددة"} · {(u.teachingAssignments || []).length} صف/شعبة
@@ -105,7 +106,7 @@ export function SettingsView({ users, roles, students, addUser, updateUser, dele
                   {roleNames.map((r) => (
                     <th key={r}>
                       <div className="perm-role-head">
-                        <span>{r}</span>
+                        <span>{roleLabel(r)}</span>
                         {roleNames.length > 1 && (
                           <button className="icon-btn-sm" title="حذف الدور" onClick={() => deleteRole(r)}>
                             <Trash2 size={12} />

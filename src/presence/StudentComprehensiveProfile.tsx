@@ -61,7 +61,7 @@ export function StudentComprehensiveProfile({
   const canManageFollowup = ["مدير النظام", "مرشد طلابي", "مشرف سلوكي"].includes(currentUser?.role);
 
   const classes = useMemo(
-    () => [...new Set((students || []).map((s) => s.class).filter(Boolean))].sort(),
+    () => [...new Set<string>((students || []).map((s) => s.class).filter(Boolean))].sort(),
     [students]
   );
 
@@ -127,7 +127,7 @@ export function StudentComprehensiveProfile({
     const stars = es.reduce(
       (x, e) =>
         x +
-        Object.values(e.scores || {}).reduce((a, b) => a + Number(b || 0), 0),
+        Object.values(e.scores || {}).reduce<number>((a, b) => a + Number(b || 0), 0),
       0
     );
 
@@ -135,7 +135,7 @@ export function StudentComprehensiveProfile({
     dt.setDate(dt.getDate() - 30);
     const cut = dt.toISOString().slice(0, 10);
     const rv = vs.filter((v) => String(v.date || "") >= cut);
-    const rep = {};
+    const rep: Record<string, number> = {};
     rv.forEach((v) => {
       if (v.item) rep[v.item] = (rep[v.item] || 0) + 1;
     });
@@ -425,7 +425,7 @@ export function StudentComprehensiveProfile({
       </div>
 
       <div class="signatures no-break">
-        <div class="sign"><b>المرشد الطلابي</b><div class="line"></div>التوقيع</div>
+        <div class="sign"><b>منسق شؤون الطلاب</b><div class="line"></div>التوقيع</div>
         <div class="sign"><b>النائب الإداري</b><div class="line"></div>التوقيع</div>
         <div class="sign"><b>مدير المدرسة</b><div class="line"></div>التوقيع</div>
       </div>
@@ -874,7 +874,7 @@ export function StudentComprehensiveProfile({
                           <option>قيد المتابعة</option>
                           <option>تم التواصل مع ولي الأمر</option>
                           <option>محولة للأخصائي الاجتماعي</option>
-                          <option>محولة للمرشد</option>
+                          <option value="محولة للمرشد">محولة لمنسق شؤون الطلاب</option>
                           <option>مغلقة</option>
                         </select>
                       </div>

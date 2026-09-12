@@ -61,7 +61,7 @@ export function CounselorDashboard({
 
     if (casesRes.error) {
       console.error("Counselor cases load error:", casesRes.error);
-      showToast?.(`تعذّر تحميل حالات المرشد: ${casesRes.error.message}`);
+      showToast?.(`تعذّر تحميل حالات منسق شؤون الطلاب: ${casesRes.error.message}`);
       setCases([]);
     } else {
       setCases(casesRes.data || []);
@@ -236,7 +236,7 @@ export function CounselorDashboard({
     items.push({
       date: String(caseRow.created_at || "").slice(0, 10),
       type: "إحالة",
-      text: caseRow.referral_reason || "إحالة للمرشد",
+      text: caseRow.referral_reason || "إحالة لمنسق شؤون الطلاب",
     });
 
     return items
@@ -247,14 +247,14 @@ export function CounselorDashboard({
   const selectedCase = cases.find((c) => c.id === selectedCaseId);
 
   if (!["مدير النظام", "مرشد طلابي"].includes(currentUser?.role)) {
-    return <EmptyState text="لوحة المرشد غير متاحة لهذا الدور" />;
+    return <EmptyState text="لوحة منسق شؤون الطلاب غير متاحة لهذا الدور" />;
   }
 
   return (
     <div className="view-stack">
       <section className="card">
         <div className="card-head">
-          <h3><Users size={18}/> لوحة المرشد الطلابي الذكية</h3>
+          <h3><Users size={18}/> لوحة منسق شؤون الطلاب الذكية</h3>
           <button className="chip-btn-outline" onClick={loadCounselorData}>
             <Activity size={14}/> تحديث
           </button>
@@ -262,7 +262,7 @@ export function CounselorDashboard({
         <div className="audit-note">
           <ShieldCheck size={16}/>
           <span>
-            الملاحظات الإرشادية التفصيلية مخصصة للمرشد والإدارة. المعلم لا يصل إلى محتوى الجلسات الداخلية.
+            الملاحظات الإرشادية التفصيلية مخصصة لمنسق شؤون الطلاب والإدارة. المعلم لا يصل إلى محتوى الجلسات الداخلية.
           </span>
         </div>
       </section>
@@ -302,7 +302,7 @@ export function CounselorDashboard({
       </section>
 
       <section className="card">
-        <div className="card-head"><h3><ClipboardList size={17}/> صندوق حالات المرشد</h3></div>
+        <div className="card-head"><h3><ClipboardList size={17}/> صندوق حالات منسق شؤون الطلاب</h3></div>
         {loading ? (
           <div className="empty-state">جارٍ تحميل الحالات...</div>
         ) : filtered.length === 0 ? (
@@ -395,7 +395,7 @@ export function CounselorDashboard({
                 </div>
               </div>
               <div className="field-label">ملاحظات الجلسة</div>
-              <textarea className="textarea-input" rows={4} value={sessionNote} onChange={(e)=>setSessionNote(e.target.value)} placeholder="ملاحظات المرشد الداخلية..." />
+              <textarea className="textarea-input" rows={4} value={sessionNote} onChange={(e)=>setSessionNote(e.target.value)} placeholder="ملاحظات منسق شؤون الطلاب الداخلية..." />
               <div className="field-label">الإجراء المتخذ</div>
               <input className="text-input" value={sessionAction} onChange={(e)=>setSessionAction(e.target.value)} placeholder="مثال: خطة متابعة أسبوعية، تواصل مع ولي الأمر..." />
               <button className="submit-btn" onClick={saveSession}><Save size={15}/> حفظ الجلسة</button>

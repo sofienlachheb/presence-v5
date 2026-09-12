@@ -1,7 +1,8 @@
+import type { AttendanceByPeriod } from "./types";
 import { writeSchoolPrint } from "./schoolPrint";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
+  LineChart as LineChartIcon, Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
   Search, Plus, X, Check, ChevronLeft, ChevronRight, Home, FileText,
   Send, ShieldAlert, GraduationCap, CalendarDays, Phone, Activity,
   ClipboardList, TrendingUp, Filter, Eye, Star, PenLine,
@@ -43,7 +44,7 @@ export function SmartAnalyticsCenter({
     !!date && (!from || date >= from) && (!to || date <= to);
 
   const selectedStudentIds = useMemo(() => {
-    return new Set(
+    return new Set<string>(
       (students || [])
         .filter((s) => filterClass === "الكل" || s.class === filterClass)
         .map((s) => s.id)
@@ -52,7 +53,7 @@ export function SmartAnalyticsCenter({
 
   const attendanceRows = useMemo(() => {
     const rows = [];
-    Object.entries(attendance || {}).forEach(([date, periods]) => {
+    Object.entries<AttendanceByPeriod>(attendance || {}).forEach(([date, periods]) => {
       Object.entries(periods || {}).forEach(([period, byStudent]) => {
         Object.entries(byStudent || {}).forEach(([studentId, rec]) => {
           if (!selectedStudentIds.has(studentId) || !rec?.status) return;
@@ -71,7 +72,7 @@ export function SmartAnalyticsCenter({
   const makeRange = (from, to) => {
     const fromObj = new Date(`${from}T00:00:00`);
     const toObj = new Date(`${to}T00:00:00`);
-    const days = Math.max(1, Math.round((toObj - fromObj) / 86400000) + 1);
+    const days = Math.max(1, Math.round((toObj.getTime() - fromObj.getTime()) / 86400000) + 1);
     const prevToObj = new Date(fromObj);
     prevToObj.setDate(prevToObj.getDate() - 1);
     const prevFromObj = new Date(prevToObj);
@@ -135,7 +136,7 @@ export function SmartAnalyticsCenter({
       const starPoints = ev.reduce(
         (sum, e) =>
           sum +
-          Object.values(e.scores || {}).reduce(
+          Object.values(e.scores || {}).reduce<number>(
             (a, b) => a + Number(b || 0),
             0
           ),
@@ -202,7 +203,7 @@ export function SmartAnalyticsCenter({
   const trendData = useMemo(() => {
     const from = new Date(`${fromDate}T00:00:00`);
     const to = new Date(`${toDate}T00:00:00`);
-    const days = Math.max(1, Math.round((to - from) / 86400000) + 1);
+    const days = Math.max(1, Math.round((to.getTime() - from.getTime()) / 86400000) + 1);
     const bucketDays = days <= 14 ? 1 : 7;
     const result = [];
 
@@ -235,12 +236,12 @@ export function SmartAnalyticsCenter({
   const classAnalysis = useMemo(() => {
     const baseClasses =
       filterClass === "الكل"
-        ? [...new Set((students || []).map((s) => s.class).filter(Boolean))]
+        ? [...new Set<string>((students || []).map((s) => s.class).filter(Boolean))]
         : [filterClass];
 
     return baseClasses
       .map((className) => {
-        const ids = new Set(
+        const ids = new Set<string>(
           students.filter((s) => s.class === className).map((s) => s.id)
         );
         const att = current.att.filter((x) => ids.has(x.studentId));
@@ -696,7 +697,7 @@ export function SmartAnalyticsCenter({
       <div className="two-col">
         <section className="card">
           <div className="card-head">
-            <h3><LineChart size={17} /> اتجاه الغياب والتأخر والمخالفات</h3>
+            <h3><LineChartIcon size={17} /> اتجاه الغياب والتأخر والمخالفات</h3>
           </div>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={trendData}>

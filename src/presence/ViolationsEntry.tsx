@@ -31,7 +31,7 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
   // بما أن students الممرّرة للمعلم هي accessibleStudents، فلن تظهر له صفوف خارج تكليفه.
   const teacherClasses = useMemo(
     () =>
-      [...new Set(
+      [...new Set<string>(
         (students || [])
           .map((s) => String(s.class || "").trim())
           .filter(Boolean)

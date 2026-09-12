@@ -48,7 +48,7 @@ export function PeriodicEvaluationView({
 
   const classes = useMemo(
     () =>
-      [...new Set(
+      [...new Set<string>(
         (students || [])
           .map((s) => String(s.class || "").trim())
           .filter(Boolean)
@@ -470,7 +470,7 @@ export function PeriodicEvaluationView({
             <h3><Eye size={17} /> الاطلاع على التقييمات الدورية</h3>
           </div>
           <div className="att-sub">
-            يمكن لمدير النظام والمرشد الطلابي الاطلاع والبحث والطباعة والإرسال لولي الأمر فقط.
+            يمكن لمدير النظام ومنسق شؤون الطلاب الاطلاع والبحث والطباعة والإرسال لولي الأمر فقط.
             إضافة تقييم جديد متاحة للمعلمين.
           </div>
         </section>

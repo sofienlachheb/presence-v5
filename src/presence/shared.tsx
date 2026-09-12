@@ -1,3 +1,4 @@
+import type { AttendanceByPeriod } from "./types";
 import React from "react";
 
 
@@ -342,7 +343,7 @@ export function buildEarlyWarningData({
   const d30 = dateDaysAgo(30);
 
   const attendanceRows = [];
-  Object.entries(attendance || {}).forEach(([date, periodMap]) => {
+  Object.entries<AttendanceByPeriod>(attendance || {}).forEach(([date, periodMap]) => {
     Object.entries(periodMap || {}).forEach(([period, studentMap]) => {
       Object.entries(studentMap || {}).forEach(([studentId, rec]) => {
         attendanceRows.push({ date, period, studentId, ...(rec || {}) });

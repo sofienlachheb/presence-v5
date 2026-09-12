@@ -198,7 +198,7 @@ export function ParentPortal({
   const totalStars = childEvaluations.reduce(
     (sum, e) =>
       sum +
-      Object.values(e.scores || {}).reduce(
+      Object.values(e.scores || {}).reduce<number>(
         (a, b) => a + Number(b || 0),
         0
       ),
@@ -351,7 +351,7 @@ export function ParentPortal({
 
       <section className="card">
         <div className="settings-tabs parent-tabs">
-          {[
+          {([
             ["overview", "نظرة عامة", Activity],
             ["attendance", "الحضور والغياب", UserCheck],
             ["violations", "المخالفات", AlertTriangle],
@@ -359,7 +359,7 @@ export function ParentPortal({
             ["periodic", "التقييم الدوري", FileText],
             ["pledges", "التعهدات", PenLine],
             ["hudhud", "رسائل هدهد", Bird],
-          ].map(([id, label, Icon]) => (
+          ] as const).map(([id, label, Icon]) => (
             <button
               key={id}
               className={`settings-tab ${
@@ -567,7 +567,7 @@ export function ParentPortal({
                   </div>
 
                   <div className="parent-star-summary">
-                    {Object.entries(e.scores || {}).map(([k, v]) => (
+                    {Object.entries<number>(e.scores || {}).map(([k, v]) => (
                       <span key={k}>
                         {k}: <b>{v}</b>
                       </span>

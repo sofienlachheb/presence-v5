@@ -97,7 +97,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
       <div class="section"><div class="section-title">خلفية الموضوع:</div><div>${esc(v.description || v.item)}</div></div>
       <div class="section"><div class="section-title">الإجراءات الأولية التي تمت:</div><div class="lines">${esc(v.action || "")}</div></div>
       <div class="section center strong">إخطار ولي الأمر بالواقعة والإجراء التالي لما بعد الواقعة: تم ( <span class="check">✓</span> ) &nbsp;&nbsp; لم يتم ( &nbsp; )</div>
-      <div class="sign-row"><div class="sign">اسم الطالب<br/>${esc(v.studentName)}<span class="dots">............................</span></div><div class="sign">المعلم / محرر الواقعة<span class="dots">............................</span></div><div class="sign">المرشد الطلابي<span class="dots">............................</span></div></div>
+      <div class="sign-row"><div class="sign">اسم الطالب<br/>${esc(v.studentName)}<span class="dots">............................</span></div><div class="sign">المعلم / محرر الواقعة<span class="dots">............................</span></div><div class="sign">منسق شؤون الطلاب<span class="dots">............................</span></div></div>
     `);
   };
 
@@ -108,7 +108,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
       <div class="doc-head">
         
         <div class="school">مدرسة عمر بن عبد العزيز الثانوية للبنين</div>
-        <div class="doc-title" style="font-size:16px">تحويل من المرشد الطلابي إلى الأخصائي الاجتماعي</div>
+        <div class="doc-title" style="font-size:16px">تحويل من منسق شؤون الطلاب إلى الأخصائي الاجتماعي</div>
         <div class="head-meta"><span>رقم المخالفة: ${esc(v.id)}</span><span>التاريخ: ${esc(v.date)}</span></div>
       </div>
       <table>
@@ -119,7 +119,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
       <div class="section"><span class="label">عدد مرات تكرار المخالفة: </span><span class="strong">${count}</span></div>
       <div class="section"><div class="section-title">خلفية الموضوع:</div><div>${esc(v.description || v.item)}</div></div>
       <table class="actions"><tr><th>الإجراء الذي تم</th><th class="n">م</th><th>إجراء الأخصائي الاجتماعي</th></tr>${actions.map((a,i)=>`<tr><td>${esc(a)}${a === v.action ? " ✓" : ""}</td><td class="n">${i+1}</td><td></td></tr>`).join("")}</table>
-      <div class="sign-row"><div class="sign">المرشد الطلابي<span class="dots">............................</span></div><div class="sign">الأخصائي الاجتماعي<span class="dots">............................</span></div><div class="sign">منسق شؤون الطلاب<span class="dots">............................</span></div></div>
+      <div class="sign-row"><div class="sign">منسق شؤون الطلاب<span class="dots">............................</span></div><div class="sign">الأخصائي الاجتماعي<span class="dots">............................</span></div><div class="sign">منسق شؤون الطلاب<span class="dots">............................</span></div></div>
     `);
   };
 

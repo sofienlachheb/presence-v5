@@ -1,4 +1,6 @@
-import React from "react";
+import { roleLabel } from "./roleLabels";
+import React, { useState } from "react";
+import { ProfileModal } from "./ProfileModal";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
   Search, Plus, X, Check, ChevronLeft, ChevronRight, Home, FileText,
@@ -15,6 +17,7 @@ import { Avatar } from "./Avatar";
    الرأس
 --------------------------------------------------------------- */
 export function Header({ selectedDate, setSelectedDate, currentUser, onLogout, notificationCount = 0, onNotifications }) {
+  const [profileOpen, setProfileOpen] = useState(false);
   const shift = (n) => {
     const d = new Date(selectedDate);
     d.setDate(d.getDate() + n);
@@ -57,10 +60,11 @@ export function Header({ selectedDate, setSelectedDate, currentUser, onLogout, n
             </button>
           <div className="user-badge">
             <Avatar name={currentUser.name} tone="#8A1538" />
-            <div className="user-badge-info">
+            <button type="button" className="user-badge-info" style={{ border: 0, background: "transparent", color: "inherit", font: "inherit", textAlign: "start", cursor: "pointer" }} aria-label="فتح الملف الشخصي" title="الملف الشخصي" onClick={() => setProfileOpen(true)}>
               <div className="user-badge-name">{currentUser.name}</div>
-              <div className="user-badge-role">{currentUser.role}</div>
-            </div>
+              <div className="user-badge-role">{roleLabel(currentUser.role)}</div>
+              <small>الملف الشخصي</small>
+            </button>
             <button className="icon-btn" title="تسجيل الخروج" onClick={onLogout}>
               <LogOut size={17} />
             </button>
@@ -68,6 +72,7 @@ export function Header({ selectedDate, setSelectedDate, currentUser, onLogout, n
           </>
         )}
       </div>
+      {profileOpen && currentUser && <ProfileModal key={currentUser.id} user={currentUser} onClose={() => setProfileOpen(false)} />}
     </header>
   );
 }

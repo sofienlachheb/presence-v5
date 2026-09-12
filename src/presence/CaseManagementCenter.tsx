@@ -32,13 +32,13 @@ export function CaseManagementCenter({
   const monthPrefix = today.slice(0, 7);
 
   const classes = useMemo(
-    () => [...new Set((students || []).map((s) => s.class).filter(Boolean))].sort(),
+    () => [...new Set<string>((students || []).map((s) => s.class).filter(Boolean))].sort(),
     [students]
   );
 
   const responsibleNames = useMemo(
     () =>
-      [...new Set(
+      [...new Set<string>(
         (caseFollowups || [])
           .map((f) => f.createdByName)
           .filter((x) => x && x !== "—")
@@ -143,7 +143,7 @@ export function CaseManagementCenter({
     "قيد المتابعة",
     "تم التواصل مع ولي الأمر",
     "محولة للأخصائي الاجتماعي",
-    "محولة للمرشد",
+    "محولة لمنسق شؤون الطلاب",
     "مغلقة",
   ];
 

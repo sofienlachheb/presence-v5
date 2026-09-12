@@ -1,0 +1,94 @@
+src/presence/App.tsx(1422,34): error TS2339: Property 'referralReason' does not exist on type '{}'.
+src/presence/App.tsx(1423,27): error TS2339: Property 'priority' does not exist on type '{}'.
+src/presence/App.tsx(1424,25): error TS2339: Property 'source' does not exist on type '{}'.
+src/presence/App.tsx(1427,30): error TS2339: Property 'assignedTo' does not exist on type '{}'.
+src/presence/App.tsx(1428,37): error TS2339: Property 'nextFollowupDate' does not exist on type '{}'.
+src/presence/CaseManagementCenter.tsx(225,25): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/CaseManagementCenter.tsx(225,33): error TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[]'.
+src/presence/CaseManagementCenter.tsx(225,48): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/CaseManagementCenter.tsx(253,25): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/CaseManagementCenter.tsx(253,33): error TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[]'.
+src/presence/CaseManagementCenter.tsx(253,43): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/Dashboard.tsx(48,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/Dashboard.tsx(48,30): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/Dashboard.tsx(275,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/Dashboard.tsx(275,33): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/Dashboard.tsx(325,21): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/presence/Dashboard.tsx(332,25): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/presence/Dashboard.tsx(727,36): error TS2322: Type '{ size: number; }' is not assignable to type 'IntrinsicAttributes & CategoricalChartProps & RefAttributes<{ readonly eventEmitterSymbol: Symbol; clipPathId: string; accessibilityManager: AccessibilityManager; ... 65 more ...; UNSAFE_componentWillUpdate?(nextProps: Readonly<...>, nextState: Readonly<...>, nextContext: any): void; }>'.
+  Property 'size' does not exist on type 'IntrinsicAttributes & CategoricalChartProps & RefAttributes<{ readonly eventEmitterSymbol: Symbol; clipPathId: string; accessibilityManager: AccessibilityManager; ... 65 more ...; UNSAFE_componentWillUpdate?(nextProps: Readonly<...>, nextState: Readonly<...>, nextContext: any): void; }>'.
+src/presence/Dashboard.tsx(769,58): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/Dashboard.tsx(772,35): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/Dashboard.tsx(1031,52): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/Dashboard.tsx(1103,48): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/DataManagementCenter.tsx(88,26): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/presence/DataManagementCenter.tsx(89,25): error TS2339: Property 'time' does not exist on type 'unknown'.
+src/presence/DataManagementCenter.tsx(352,43): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/DataManagementCenter.tsx(352,51): error TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[]'.
+src/presence/DataManagementCenter.tsx(352,66): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/DataManagementCenter.tsx(370,81): error TS2345: Argument of type '{ [k: string]: true; }' is not assignable to parameter of type 'SetStateAction<{ students: boolean; attendance: boolean; violations: boolean; evaluations: boolean; periodicEvaluations: boolean; followups: boolean; contacts: boolean; hudhud: boolean; pledges: boolean; users: boolean; teacherClasses: boolean; periods: boolean; }>'.
+  Type '{ [k: string]: true; }' is missing the following properties from type '{ students: boolean; attendance: boolean; violations: boolean; evaluations: boolean; periodicEvaluations: boolean; followups: boolean; contacts: boolean; hudhud: boolean; pledges: boolean; users: boolean; teacherClasses: boolean; periods: boolean; }': students, attendance, violations, evaluations, and 8 more.
+src/presence/DataManagementCenter.tsx(371,81): error TS2345: Argument of type '{ [k: string]: false; }' is not assignable to parameter of type 'SetStateAction<{ students: boolean; attendance: boolean; violations: boolean; evaluations: boolean; periodicEvaluations: boolean; followups: boolean; contacts: boolean; hudhud: boolean; pledges: boolean; users: boolean; teacherClasses: boolean; periods: boolean; }>'.
+  Type '{ [k: string]: false; }' is missing the following properties from type '{ students: boolean; attendance: boolean; violations: boolean; evaluations: boolean; periodicEvaluations: boolean; followups: boolean; contacts: boolean; hudhud: boolean; pledges: boolean; users: boolean; teacherClasses: boolean; periods: boolean; }': students, attendance, violations, evaluations, and 8 more.
+src/presence/EarlyWarningCenter.tsx(99,41): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/EarlyWarningCenter.tsx(99,49): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/EvaluationView.tsx(67,24): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<string>'.
+src/presence/EvaluationView.tsx(238,23): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/EvaluationView.tsx(242,28): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/EvaluationView.tsx(418,23): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/EvaluationView.tsx(418,31): error TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[]'.
+src/presence/EvaluationView.tsx(418,46): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/HudhudView.tsx(54,24): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<string>'.
+src/presence/HudhudView.tsx(120,23): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/HudhudView.tsx(124,28): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/ParentAcknowledgementCenter.tsx(116,167): error TS2345: Argument of type 'string' is not assignable to parameter of type 'SetStateAction<number>'.
+src/presence/ParentAcknowledgementCenter.tsx(128,214): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/ParentAcknowledgementCenter.tsx(128,222): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/ParentPortal.tsx(202,19): error TS2365: Operator '+' cannot be applied to types 'unknown' and 'number'.
+src/presence/ParentPortal.tsx(364,15): error TS2322: Type 'string | ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'Key'.
+  Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'Key'.
+src/presence/ParentPortal.tsx(368,37): error TS2345: Argument of type 'string | ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to parameter of type 'SetStateAction<string>'.
+  Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'SetStateAction<string>'.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(prevState: string) => string'.
+      Types of parameters 'props' and 'prevState' are incompatible.
+        Type 'string' has no properties in common with type 'Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>'.
+src/presence/ParentPortal.tsx(371,15): error TS2322: Type 'string | ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ReactNode'.
+  Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type 'ReactNode'.
+src/presence/ParentPortal.tsx(572,33): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/PeriodicEvaluationView.tsx(75,24): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<string>'.
+src/presence/PeriodicEvaluationView.tsx(323,19): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/PeriodicEvaluationView.tsx(326,38): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<string>'.
+src/presence/PeriodicEvaluationView.tsx(331,24): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/PeriodicEvaluationView.tsx(494,23): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/PeriodicEvaluationView.tsx(494,31): error TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[]'.
+src/presence/PeriodicEvaluationView.tsx(494,46): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/Reports.tsx(80,23): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/Reports.tsx(80,33): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/Reports.tsx(115,39): error TS2365: Operator '+' cannot be applied to types 'number' and 'unknown'.
+src/presence/Reports.tsx(118,28): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/Reports.tsx(153,61): error TS2365: Operator '+' cannot be applied to types 'unknown' and 'number'.
+src/presence/Reports.tsx(161,85): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/Reports.tsx(380,48): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/Reports.tsx(380,56): error TS2322: Type 'unknown' is not assignable to type 'string | number | readonly string[]'.
+src/presence/Reports.tsx(380,66): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/Reports.tsx(480,127): error TS2365: Operator '+' cannot be applied to types 'number' and 'unknown'.
+src/presence/shared.tsx(348,56): error TS2698: Spread types may only be created from object types.
+src/presence/SmartAnalyticsCenter.tsx(58,59): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/presence/SmartAnalyticsCenter.tsx(63,25): error TS2339: Property 'status' does not exist on type 'unknown'.
+src/presence/SmartAnalyticsCenter.tsx(74,42): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/SmartAnalyticsCenter.tsx(74,50): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/SmartAnalyticsCenter.tsx(139,23): error TS2365: Operator '+' cannot be applied to types 'unknown' and 'number'.
+src/presence/SmartAnalyticsCenter.tsx(205,42): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/SmartAnalyticsCenter.tsx(205,47): error TS2363: The right-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/presence/SmartAnalyticsCenter.tsx(699,28): error TS2322: Type '{ size: number; }' is not assignable to type 'IntrinsicAttributes & CategoricalChartProps & RefAttributes<{ readonly eventEmitterSymbol: Symbol; clipPathId: string; accessibilityManager: AccessibilityManager; ... 65 more ...; UNSAFE_componentWillUpdate?(nextProps: Readonly<...>, nextState: Readonly<...>, nextContext: any): void; }>'.
+  Property 'size' does not exist on type 'IntrinsicAttributes & CategoricalChartProps & RefAttributes<{ readonly eventEmitterSymbol: Symbol; clipPathId: string; accessibilityManager: AccessibilityManager; ... 65 more ...; UNSAFE_componentWillUpdate?(nextProps: Readonly<...>, nextState: Readonly<...>, nextContext: any): void; }>'.
+src/presence/SmartAnalyticsCenter.tsx(738,51): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/SmartAnalyticsCenter.tsx(741,27): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/StudentComprehensiveProfile.tsx(130,56): error TS2365: Operator '+' cannot be applied to types 'unknown' and 'number'.
+src/presence/StudentComprehensiveProfile.tsx(147,26): error TS2365: Operator '>=' cannot be applied to types 'unknown' and 'number'.
+src/presence/StudentComprehensiveProfile.tsx(516,43): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/StudentComprehensiveProfile.tsx(516,51): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/presence/UnifiedStudentFile.tsx(48,16): error TS2552: Cannot find name 'User'. Did you mean 'Users'?
+src/presence/ViolationsEntry.tsx(62,24): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'SetStateAction<string>'.
+src/presence/ViolationsEntry.tsx(114,23): error TS2322: Type 'unknown' is not assignable to type 'Key'.
+src/presence/ViolationsEntry.tsx(118,28): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.

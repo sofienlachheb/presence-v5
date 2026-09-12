@@ -1,3 +1,4 @@
+import type { AttendanceByPeriod } from "./types";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import * as XLSX from "xlsx";
 import {
@@ -30,7 +31,7 @@ export function DataManagementCenter({
   const [filterClass, setFilterClass] = useState("الكل");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [selectedSets, setSelectedSets] = useState({
+  const [selectedSets, setSelectedSets] = useState<Record<string, boolean>>({
     students: true,
     attendance: true,
     violations: true,
@@ -46,7 +47,7 @@ export function DataManagementCenter({
   });
 
   const classes = useMemo(
-    () => [...new Set((students || []).map((s) => s.class).filter(Boolean))].sort(),
+    () => [...new Set<string>((students || []).map((s) => s.class).filter(Boolean))].sort(),
     [students]
   );
 
@@ -58,7 +59,7 @@ export function DataManagementCenter({
 
   const allowedStudentIds = useMemo(
     () =>
-      new Set(
+      new Set<string>(
         (students || [])
           .filter((s) => filterClass === "الكل" || s.class === filterClass)
           .map((s) => s.id)
@@ -74,7 +75,7 @@ export function DataManagementCenter({
 
   const flattenAttendance = () => {
     const rows = [];
-    Object.entries(attendance || {}).forEach(([date, periodMap]) => {
+    Object.entries<AttendanceByPeriod>(attendance || {}).forEach(([date, periodMap]) => {
       if (!inRange(date)) return;
       Object.entries(periodMap || {}).forEach(([period, studentMap]) => {
         Object.entries(studentMap || {}).forEach(([studentId, rec]) => {

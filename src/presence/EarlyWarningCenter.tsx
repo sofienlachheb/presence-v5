@@ -41,7 +41,7 @@ export function EarlyWarningCenter({
     [students, attendance, violations, evaluations, periodicEvaluations, caseFollowups, guardianContacts]
   );
 
-  const classes = [...new Set((students || []).map((s) => s.class).filter(Boolean))].sort();
+  const classes = [...new Set<string>((students || []).map((s) => s.class).filter(Boolean))].sort();
   const levels = ["أولوية عالية", "يحتاج تدخل", "يحتاج متابعة", "مستقر"];
 
   const filtered = alerts.filter((x) => {
@@ -159,7 +159,7 @@ export function EarlyWarningCenter({
                       })
                     }
                   >
-                    <Users size={14}/> إحالة للمرشد
+                    <Users size={14}/> إحالة لمنسق شؤون الطلاب
                   </button>
                 )}
               </div>

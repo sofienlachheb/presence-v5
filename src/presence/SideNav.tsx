@@ -25,7 +25,7 @@ export function SideNav({ view, setView, pendingCount, perms, currentUser }) {
     { id: "student-profile", label: "الملف الشامل للطالب", icon: FileText },
     { id: "case-center", label: "مركز الحالات والمتابعات", icon: ClipboardList, adminOnly: true },
     { id: "notifications", label: "الإشعارات والمهام", icon: Bell },
-    { id: "counselor-center", label: "لوحة المرشد الطلابي", icon: Users, roles: ["مدير النظام", "مرشد طلابي"] },
+    { id: "counselor-center", label: "لوحة منسق شؤون الطلاب", icon: Users, roles: ["مدير النظام", "مرشد طلابي"] },
     { id: "audit-log", label: "سجل العمليات", icon: HistoryIcon, adminOnly: true },
     { id: "data-center", label: "النسخ الاحتياطي وإدارة البيانات", icon: Save, adminOnly: true },
     { id: "early-warning", label: "التنبيهات الذكية والإنذار المبكر", icon: AlertTriangle, adminOnly: true },

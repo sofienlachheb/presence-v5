@@ -24,7 +24,7 @@ export function HudhudView({ students, hudhudMessages, sendHudhudMessage, curren
   // للمعلم فقط: نظهر الصفوف المسندة إليه بدون الشعب.
   const teacherClasses = useMemo(
     () =>
-      [...new Set(
+      [...new Set<string>(
         (students || [])
           .map((s) => String(s.class || "").trim())
           .filter(Boolean)

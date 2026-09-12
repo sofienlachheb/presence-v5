@@ -48,7 +48,7 @@ export function ParentAcknowledgementCenter({
 
   const studentFor=id=>students.find(s=>s.id===id);
   const guardianFor=id=>guardians.find(g=>g.id===id);
-  const classes=[...new Set(students.map(s=>s.class).filter(Boolean))].sort();
+  const classes=[...new Set<string>(students.map(s=>s.class).filter(Boolean))].sort();
   const now=new Date();
 
   const statusOf=r=>{
@@ -113,7 +113,7 @@ export function ParentAcknowledgementCenter({
 
     <section className="card">
       <div className="card-head"><h3>إنشاء طلب إقرار</h3><span className="att-sub">آخر السجلات القابلة للإرسال</span></div>
-      <div className="ack-deadline"><span>مهلة الإقرار:</span><input type="number" min="1" className="text-input" value={deadlineHours} onChange={e=>setDeadlineHours(e.target.value)}/><b>ساعة</b></div>
+      <div className="ack-deadline"><span>مهلة الإقرار:</span><input type="number" min="1" className="text-input" value={deadlineHours} onChange={e=>setDeadlineHours(Number(e.target.value))}/><b>ساعة</b></div>
       <div className="ack-candidate-list">
         {candidates.map(c=>{const s=studentFor(c.studentId);return <div className="ack-candidate" key={`${c.type}-${c.id}`}>
           <div><b>{s?.name||"طالب"}</b><span>{typeLabel[c.type]} · {c.label} · {c.date||"—"}</span></div>

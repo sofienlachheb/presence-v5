@@ -435,7 +435,7 @@ export function App() {
       setCurrentUserId(session?.user?.id || null);
       setSessionChecked(true);
 
-      if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED" || event === "USER_UPDATED")) {
+      if (session?.user && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
         setLoaded(false);
         await loadAllData(session.user.id);
       }
@@ -547,10 +547,7 @@ export function App() {
 
   /* ------------------------------------------------------------
      المستخدمون (حسابات الموظفين وأولياء الأمور)
-     ملاحظة: إنشاء المستخدم يتم عبر Supabase Auth (signUp)، فقد يتطلب
-     تأكيد البريد الإلكتروني حسب إعدادات المشروع في Supabase.
-     تغيير كلمة مرور مستخدم آخر غير متاح من الواجهة مباشرة لأسباب أمنية؛
-     استخدم "إرسال رابط إعادة تعيين كلمة المرور" بدلاً من ذلك.
+     إنشاء الحسابات عبر دالة Supabase، وكلمة المرور الشخصية من الملف الشخصي.
   ------------------------------------------------------------ */
   const syncGuardianChildren = async (guardianId, childIds) => {
     await supabase.from("guardian_children").delete().eq("guardian_id", guardianId);
@@ -1328,7 +1325,7 @@ const addUser = async (data) => {
   const addCaseFollowup = async (studentId, data) => {
     const allowedRoles = ["مدير النظام", "مرشد طلابي", "مشرف سلوكي"];
     if (!allowedRoles.includes(currentUser?.role)) {
-      showToast("إضافة متابعة للحالة متاحة للإدارة والمرشد والمشرف السلوكي فقط");
+      showToast("إضافة متابعة للحالة متاحة للإدارة ومنسق شؤون الطلاب والمشرف فقط");
       return null;
     }
 
@@ -1377,7 +1374,7 @@ const addUser = async (data) => {
   const completeCaseFollowup = async (followupId) => {
     const allowedRoles = ["مدير النظام", "مرشد طلابي", "مشرف سلوكي"];
     if (!allowedRoles.includes(currentUser?.role)) {
-      showToast("إغلاق إجراء المتابعة متاح للإدارة والمرشد والمشرف السلوكي فقط");
+      showToast("إغلاق إجراء المتابعة متاح للإدارة ومنسق شؤون الطلاب والمشرف فقط");
       return false;
     }
     const { error } = await supabase
@@ -1396,9 +1393,9 @@ const addUser = async (data) => {
     return true;
   };
 
-  const referStudentToCounselor = async (studentId, payload = {}) => {
+  const referStudentToCounselor = async (studentId, payload: { referralReason?: string; priority?: string; source?: string; assignedTo?: string; nextFollowupDate?: string } = {}) => {
     if (!["مدير النظام", "مرشد طلابي"].includes(currentUser?.role)) {
-      showToast("إحالة الطالب للمرشد متاحة لمدير النظام والمرشد الطلابي فقط");
+      showToast("إحالة الطالب لمنسق شؤون الطلاب متاحة لمدير النظام ومنسق شؤون الطلاب فقط");
       return null;
     }
 
@@ -1436,14 +1433,14 @@ const addUser = async (data) => {
       return null;
     }
 
-    showToast("تمت إحالة الطالب إلى لوحة المرشد الطلابي");
+    showToast("تمت إحالة الطالب إلى لوحة منسق شؤون الطلاب");
     return row;
   };
 
   const addGuardianContact = async (studentId, data) => {
     const allowedRoles = ["مدير النظام", "مرشد طلابي", "مشرف سلوكي"];
     if (!allowedRoles.includes(currentUser?.role)) {
-      showToast("توثيق التواصل مع ولي الأمر متاح للإدارة والمرشد والمشرف السلوكي فقط");
+      showToast("توثيق التواصل مع ولي الأمر متاح للإدارة ومنسق شؤون الطلاب والمشرف فقط");
       return null;
     }
 

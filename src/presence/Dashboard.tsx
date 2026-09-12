@@ -1,6 +1,7 @@
+import type { AttendanceByPeriod } from "./types";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
+  LineChart as LineChartIcon, Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
   Search, Plus, X, Check, ChevronLeft, ChevronRight, Home, FileText,
   Send, ShieldAlert, GraduationCap, CalendarDays, Phone, Activity,
   ClipboardList, TrendingUp, Filter, Eye, Star, PenLine,
@@ -40,7 +41,7 @@ export function Dashboard({
   const isAdmin = currentUser?.role === "مدير النظام";
 
   const topStudents = useMemo(() => {
-    const counts = {};
+    const counts: Record<string, number> = {};
     violations.forEach((v) => {
       counts[v.studentId] = (counts[v.studentId] || 0) + 1;
     });
@@ -114,7 +115,7 @@ export function Dashboard({
         reason = `وجود ${severe.length} مخالفة من الدرجة الثالثة/الرابعة`;
         priority = 4;
       } else if (recent.length >= 3) {
-        type = "متابعة المرشد الطلابي";
+        type = "متابعة منسق شؤون الطلاب";
         reason = `تكرار المخالفات خلال آخر 30 يوماً (${recent.length})`;
         priority = 3;
       } else if (absences >= 3) {
@@ -159,7 +160,7 @@ export function Dashboard({
     { id: "periodic-evaluation", label: "التقييم الدوري", icon: FileText, bg: "#E9EEFB", color: "#5B8DEF" },
     { id: "student-profile", label: "الملف الشامل", icon: GraduationCap, bg: "#E7ECF3", color: "#1E2A4A" },
     { id: "case-center", label: "مركز الحالات والمتابعات", icon: ClipboardList, bg: "#FBEAE0", color: "#E07B39", adminOnly: true },
-    { id: "counselor-center", label: "لوحة المرشد الطلابي", icon: Users, bg: "#EDE7FA", color: "#8E6FCE", roles: ["مدير النظام", "مرشد طلابي"] },
+    { id: "counselor-center", label: "لوحة منسق شؤون الطلاب", icon: Users, bg: "#EDE7FA", color: "#8E6FCE", roles: ["مدير النظام", "مرشد طلابي"] },
     { id: "audit-log", label: "سجل العمليات", icon: HistoryIcon, bg: "#E9EEFB", color: "#5B8DEF", adminOnly: true },
     { id: "data-center", label: "النسخ الاحتياطي وإدارة البيانات", icon: Save, bg: "#E7F5EF", color: "#2F9E6E", adminOnly: true },
     { id: "early-warning", label: "التنبيهات الذكية والإنذار المبكر", icon: AlertTriangle, bg: "#FCE8E6", color: "#C7433F", adminOnly: true },
@@ -184,7 +185,7 @@ export function Dashboard({
 
     const studentRisk = students.map((st) => {
       const att = [];
-      Object.entries(attendance || {}).forEach(([date, ps]) => {
+      Object.entries<AttendanceByPeriod>(attendance || {}).forEach(([date, ps]) => {
         Object.entries(ps || {}).forEach(([period, rows]) => {
           const r = rows?.[st.id];
           if (r) att.push({ date, period, ...r });
@@ -263,7 +264,7 @@ export function Dashboard({
       ).length,
     }));
 
-    const classCounts = {};
+    const classCounts: Record<string, number> = {};
     violations
       .filter((v) => String(v.date || "") >= cut30Iso)
       .forEach((v) => {
@@ -319,7 +320,7 @@ export function Dashboard({
 
     // تحويل سجل الحضور إلى قائمة سهلة للتحليل.
     const attendanceEvents = [];
-    Object.entries(attendance || {}).forEach(([date, periods]) => {
+    Object.entries<AttendanceByPeriod>(attendance || {}).forEach(([date, periods]) => {
       Object.entries(periods || {}).forEach(([period, rows]) => {
         Object.entries(rows || {}).forEach(([studentId, rec]) => {
           if (!rec?.status) return;
@@ -495,9 +496,9 @@ export function Dashboard({
       "يحتاج متابعة";
 
     // ترتيب الصفوف اعتماداً على الحضور والانضباط والمخالفات.
-    const classRanking = [...new Set((students || []).map((s) => s.class).filter(Boolean))]
+    const classRanking = [...new Set<string>((students || []).map((s) => s.class).filter(Boolean))]
       .map((className) => {
-        const ids = new Set(
+        const ids = new Set<string>(
           students.filter((s) => s.class === className).map((s) => s.id)
         );
 
@@ -724,7 +725,7 @@ export function Dashboard({
               <div className="two-col">
                 <section className="card">
                   <div className="card-head">
-                    <h3><LineChart size={17} /> الاتجاه الأسبوعي — آخر 8 أسابيع</h3>
+                    <h3><LineChartIcon size={17} /> الاتجاه الأسبوعي — آخر 8 أسابيع</h3>
                   </div>
                   <ResponsiveContainer width="100%" height={260}>
                     <LineChart data={advancedAdminStats.weeklyTrend}>

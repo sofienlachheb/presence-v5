@@ -47,12 +47,12 @@ export function Reports({ violations, students, attendance, classes, users, curr
   }, [violations, fromDate, toDate, filterClass, filterStudent, filterViolation]);
 
   const violationTypes = useMemo(
-    () => [...new Set((violations || []).map((v) => v.item).filter(Boolean))].sort(),
+    () => [...new Set<string>((violations || []).map((v) => v.item).filter(Boolean))].sort(),
     [violations]
   );
 
   const teacherNames = useMemo(
-    () => [...new Set((violations || []).map((v) => v.teacherName).filter((x) => x && x !== "—"))].sort(),
+    () => [...new Set<string>((violations || []).map((v) => v.teacherName).filter((x) => x && x !== "—"))].sort(),
     [violations]
   );
 
@@ -70,7 +70,7 @@ export function Reports({ violations, students, attendance, classes, users, curr
   ];
 
   const groupCount = (items, keyFn) => {
-    const map = {};
+    const map: Record<string, number> = {};
     items.forEach((item) => {
       const key = keyFn(item) || "غير محدد";
       map[key] = (map[key] || 0) + 1;
@@ -146,7 +146,7 @@ export function Reports({ violations, students, attendance, classes, users, curr
 
   const monthlyDegreeSections = useMemo(() => [1, 2, 3, 4].map((degree) => {
     const degreeItems = DEGREES[degree].items.map((item) => {
-      const byClass = {};
+      const byClass: Record<string, number> = {};
       monthlyClasses.forEach((cls) => {
         byClass[cls] = monthlyViolations.filter((v) => v.degree === degree && v.item === item && v.class === cls).length;
       });

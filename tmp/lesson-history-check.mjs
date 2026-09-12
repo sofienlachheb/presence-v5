@@ -1,0 +1,18 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import ts from 'typescript';
+const source = fs.readFileSync('src/presence/LessonPointsView.tsx', 'utf8');
+const result = ts.transpileModule(source, { compilerOptions: { jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 }, reportDiagnostics: true });
+assert.equal(result.diagnostics.length, 0);
+const logic = source.slice(source.indexOf('  const normalize ='), source.indexOf('  const history = selected'));
+const query = new Function('records', 'group', 'historyScope', 'lessonDate', 'historyFrom', 'historyTo', 'historyStatus', 'historySearch', 'groupKey', logic + '\nreturn { filteredHistory, historyDays, invalidHistoryRange };');
+const rows = [{id:'1',lesson_date:'2026-09-11',created_at:'2026-09-11',student_name:'أَحمد',points:2}, {id:'2',lesson_date:'2026-09-10',created_at:'2026-09-10',student_name:'علي',points:3}, {id:'3',lesson_date:'2026-09-10',created_at:'2026-09-10',student_name:'أحمد',points:1,voided_at:'2026-09-11'}];
+const run = (scope,from='',to='',status='active',search='') => query(rows,'',scope,'2026-09-11',from,to,status,search,()=> '');
+assert.deepEqual(run('day').filteredHistory.map(r=>r.id), ['1']);
+assert.deepEqual(run('all','','','active','احمد').filteredHistory.map(r=>r.id), ['1']);
+assert.deepEqual(run('range','2026-09-10','2026-09-10').filteredHistory.map(r=>r.id), ['2']);
+assert.deepEqual(run('all','','','deleted').filteredHistory.map(r=>r.id), ['3']);
+assert.deepEqual(run('all','','','all').historyDays, ['2026-09-11','2026-09-10']);
+assert.equal(run('range','2026-09-11','2026-09-10').invalidHistoryRange,true);
+assert.equal(run('all','','','active','غير موجود').filteredHistory.length,0);
+console.log('PASS: TSX transpilation and 7 history filtering checks');

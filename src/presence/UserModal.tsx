@@ -1,3 +1,4 @@
+import { roleLabel } from "./roleLabels";
 import "./user-modal.css";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
@@ -96,7 +97,7 @@ export function UserModal({ user, roles, students, classes, sections, onClose, o
           <div className="field-label">الدور</div>
           <select className="select-input" value={role} onChange={(e) => setRole(e.target.value)}>
             {roles.map((r) => (
-              <option key={r} value={r}>{r}</option>
+              <option key={r} value={r}>{roleLabel(r)}</option>
             ))}
           </select>
 
@@ -184,7 +185,7 @@ export function UserModal({ user, roles, students, classes, sections, onClose, o
                 phone: phone.trim(),
                 role,
                 active,
-                password: password.trim(),
+                ...(!user ? { password: password.trim() } : {}),
                 teachingSubject: isTeacher ? teachingSubject.trim() : null,
                 childStudentIds: isGuardian ? childIds : undefined,
                 teachingAssignments: isTeacher

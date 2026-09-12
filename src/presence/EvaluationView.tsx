@@ -36,7 +36,7 @@ export function EvaluationView({ students, evaluations, addEvaluation, sendHudhu
 
   const availableClasses = useMemo(
     () =>
-      [...new Set(
+      [...new Set<string>(
         (students || [])
           .map((s) => String(s.class || "").trim())
           .filter(Boolean)
