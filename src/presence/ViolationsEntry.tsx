@@ -26,10 +26,11 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
   const [action, setAction] = useState("تنبيه شفهي للطالب");
 
   const isTeacher = currentUser?.role === "معلم";
+  const usesClassPicker = isTeacher || ["مشرف سلوكي", "مشرف"].includes(currentUser?.role);
 
-  // للمعلم فقط: نعرض الصفوف المرتبطة به دون إظهار الشعب.
+  // للمعلم والمشرف: اختيار الصف أولاً، ثم الطالب من القائمة المتاحة للحساب.
   // بما أن students الممرّرة للمعلم هي accessibleStudents، فلن تظهر له صفوف خارج تكليفه.
-  const teacherClasses = useMemo(
+  const availableClasses = useMemo(
     () =>
       [...new Set<string>(
         (students || [])
@@ -39,15 +40,15 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
     [students]
   );
 
-  // بعد اختيار الصف، نعرض جميع طلابه الذين يحق للمعلم التعامل معهم،
+  // بعد اختيار الصف، نعرض طلابه المتاحين للمستخدم،
   // حتى لو كانوا موزعين على أكثر من شعبة، دون إظهار اسم الشعبة في الواجهة.
   const classStudents = useMemo(() => {
-    if (!isTeacher) return students || [];
+    if (!usesClassPicker) return students || [];
     if (!selectedClass) return [];
     return (students || []).filter(
       (s) => String(s.class || "").trim() === selectedClass
     );
-  }, [students, isTeacher, selectedClass]);
+  }, [students, usesClassPicker, selectedClass]);
 
   const filtered = classStudents.filter(
     (s) =>
@@ -56,17 +57,17 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
   );
 
   useEffect(() => {
-    if (!isTeacher) return;
+    if (!usesClassPicker) return;
 
-    if (teacherClasses.length === 1 && !selectedClass) {
-      setSelectedClass(teacherClasses[0]);
+    if (isTeacher && availableClasses.length === 1 && !selectedClass) {
+      setSelectedClass(availableClasses[0]);
     }
 
-    if (selectedClass && !teacherClasses.includes(selectedClass)) {
+    if (selectedClass && !availableClasses.includes(selectedClass)) {
       setSelectedClass("");
       setViolStudent(null);
     }
-  }, [isTeacher, teacherClasses, selectedClass, setViolStudent]);
+  }, [usesClassPicker, isTeacher, availableClasses, selectedClass, setViolStudent]);
 
   const reset = () => {
     setDegree(null);
@@ -97,19 +98,19 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
           <div className="card-head">
             <h3>
               <Search size={17} />
-              {isTeacher ? "اختيار الصف ثم الطالب" : "اختيار الطالب"}
+              {usesClassPicker ? "اختيار الصف ثم الطالب" : "اختيار الطالب"}
             </h3>
           </div>
 
-          {isTeacher && (
+          {usesClassPicker && (
             <>
               <div className="field-label" style={{ marginTop: 0 }}>١. اختر الصف</div>
 
-              {teacherClasses.length === 0 ? (
-                <EmptyState text="لم يتم إسناد أي صف لهذا المعلم بعد" />
+              {availableClasses.length === 0 ? (
+                <EmptyState text={isTeacher ? "لم يتم إسناد أي صف لهذا المعلم بعد" : "لا توجد صفوف بها طلاب"} />
               ) : (
                 <div className="class-tabs" style={{ marginBottom: 14 }}>
-                  {teacherClasses.map((cls) => (
+                  {availableClasses.map((cls) => (
                     <button
                       key={cls}
                       className={`class-tab ${selectedClass === cls ? "class-tab-active" : ""}`}
@@ -123,10 +124,10 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
             </>
           )}
 
-          {(!isTeacher || selectedClass) && (
+          {(!usesClassPicker || selectedClass) && (
             <>
-              <div className="field-label" style={{ marginTop: isTeacher ? 4 : 0 }}>
-                {isTeacher ? "٢. اختر الطالب" : "الطالب"}
+              <div className="field-label" style={{ marginTop: usesClassPicker ? 4 : 0 }}>
+                {usesClassPicker ? "٢. اختر الطالب" : "الطالب"}
               </div>
 
               <div className="search-box">
@@ -142,13 +143,13 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
                 {filtered.length === 0 ? (
                   <EmptyState
                     text={
-                      isTeacher
-                        ? "لا يوجد طلاب في هذا الصف ضمن الصفوف المسندة إليك"
+                      usesClassPicker
+                        ? "لا يوجد طلاب مطابقون في الصف المحدد"
                         : "لا يوجد طلاب مطابقون"
                     }
                   />
                 ) : (
-                  filtered.slice(0, 80).map((s) => (
+                  filtered.map((s) => (
                     <button
                       key={s.id}
                       className={`student-pick ${violStudent?.id === s.id ? "student-pick-active" : ""}`}
@@ -168,10 +169,10 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
         </section>
 
         <section className="card">
-          {!violStudent ? (
+          {!violStudent || (usesClassPicker && (!selectedClass || String(violStudent.class || "").trim() !== selectedClass)) ? (
             <EmptyState
               text={
-                isTeacher && !selectedClass
+                usesClassPicker && !selectedClass
                   ? "اختر الصف أولاً ثم اختر الطالب لتسجيل المخالفة"
                   : "اختر طالباً من القائمة لبدء تسجيل المخالفة"
               }
