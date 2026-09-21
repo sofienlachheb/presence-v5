@@ -15,13 +15,28 @@ import { EmptyState } from "./EmptyState";
    نماذج التعهد (تعهد الطالب / تعهد ولي الأمر)
 --------------------------------------------------------------- */
 export function PledgesView({ students, violations, pledges, addPledge, setPrintPledge }) {
+  const [selectedClass, setSelectedClass] = useState("");
   const [search, setSearch] = useState("");
   const [student, setStudent] = useState(null);
   const [type, setType] = useState("طالب");
   const [violationRef, setViolationRef] = useState("");
   const [text, setText] = useState("");
 
-  const filtered = students.filter((s) => s.name.includes(search) || s.class.includes(search));
+  const classes = useMemo(
+    () => [...new Set<string>(students.map((s) => s.class).filter(Boolean))],
+    [students]
+  );
+  const filtered = selectedClass
+    ? students.filter((s) => s.class === selectedClass && s.name.includes(search.trim()))
+    : [];
+
+  const changeClass = (value: string) => {
+    setSelectedClass(value);
+    setSearch("");
+    setStudent(null);
+    setViolationRef("");
+    setText("");
+  };
   const studentViolations = student ? violations.filter((v) => v.studentId === student.id) : [];
 
   const applyTemplate = (st, vRef, t) => {
@@ -59,12 +74,18 @@ export function PledgesView({ students, violations, pledges, addPledge, setPrint
       <div className="two-col two-col-narrow">
         <section className="card">
           <div className="card-head"><h3><Search size={17} /> اختيار الطالب</h3></div>
+          <label className="field-label" htmlFor="pledge-class">الصف</label>
+          <select id="pledge-class" className="select-input" value={selectedClass} onChange={(e) => changeClass(e.target.value)}>
+            <option value="">اختر الصف أولاً</option>
+            {classes.map((name) => <option key={name} value={name}>{name}</option>)}
+          </select>
           <div className="search-box">
             <Search size={16} />
-            <input placeholder="ابحث بالاسم أو الصف..." value={search} onChange={(e) => setSearch(e.target.value)} />
+            <input aria-label="البحث عن طالب في الصف" disabled={!selectedClass} placeholder="ابحث باسم الطالب في الصف..." value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
           <div className="student-pick-list">
-            {filtered.slice(0, 40).map((s) => (
+            {!selectedClass ? <EmptyState text="اختر الصف لعرض الطلاب" /> : filtered.length === 0 ? <EmptyState text="لا يوجد طلاب مطابقون في هذا الصف" /> : null}
+            {filtered.map((s) => (
               <button
                 key={s.id}
                 className={`student-pick ${student?.id === s.id ? "student-pick-active" : ""}`}
