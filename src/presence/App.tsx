@@ -111,7 +111,7 @@ export function App() {
 
   const mapRolesRows = (rows) => {
     const map = {};
-    rows.forEach((r) => (map[r.name] = r.permissions || {}));
+    rows.forEach((r) => (map[r.name] = { ...r.permissions, "attendance-register": r.permissions?.["attendance-register"] ?? (r.name !== "مدير النظام" && r.permissions?.attendance === true) }));
     return map;
   };
 
@@ -495,7 +495,7 @@ export function App() {
       .eq("name", profile?.role)
       .maybeSingle();
     const perms = roleRow?.permissions || roles[profile?.role] || {};
-    const firstAllowed = PERMISSION_SECTIONS.find((s) => perms[s.id] !== false)?.id || "dashboard";
+    const firstAllowed = PERMISSION_SECTIONS.find((s) => s.id !== "attendance-register" && perms[s.id] !== false)?.id || "dashboard";
     setView(firstAllowed);
     showToast(`مرحباً بك، ${profile?.name || ""}`);
   };
@@ -1043,7 +1043,10 @@ const addUser = async (data) => {
     const newPerms = { ...roles[role], [sectionId]: !roles[role]?.[sectionId] };
     setRoles((prev) => ({ ...prev, [role]: newPerms }));
     const { error } = await supabase.from("roles").update({ permissions: newPerms }).eq("name", role);
-    if (error) showToast("تعذّر حفظ تعديل الصلاحية");
+    if (error) {
+      setRoles((prev) => ({ ...prev, [role]: roles[role] }));
+      showToast("تعذّر حفظ تعديل الصلاحية");
+    }
   };
 
   const addRole = async (name) => {
@@ -1577,6 +1580,10 @@ const addUser = async (data) => {
   const todaysAttendance = attendance[selectedDate]?.[attPeriod] || {};
 
   const saveAttendanceBatch = async (period, changes) => {
+    if (currentPerms.attendance === false || currentPerms["attendance-register"] !== true) {
+      showToast("ليس لديك صلاحية تسجيل الحضور");
+      return false;
+    }
     const entries = Object.entries(changes);
     if (entries.length === 0) return true;
 
@@ -1798,6 +1805,7 @@ const addUser = async (data) => {
           )}
           {view === "attendance" && (
             <AttendanceView
+              canRegister={currentPerms.attendance !== false && currentPerms["attendance-register"] === true}
               attClass={attClass}
               setAttClass={setAttClass}
               attPeriod={attPeriod}

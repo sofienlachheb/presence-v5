@@ -185,6 +185,7 @@ export const PLEDGE_TEMPLATES = {
 export const PERMISSION_SECTIONS = [
   { id: "dashboard", label: "لوحة المتابعة" },
   { id: "attendance", label: "الحضور والغياب" },
+  { id: "attendance-register", label: "تسجيل الحضور" },
   { id: "violations", label: "تسجيل مخالفة" },
   { id: "log", label: "سجلّ المخالفات" },
   { id: "pledges", label: "نماذج التعهد" },
@@ -206,7 +207,7 @@ export const allPerms = (val) =>
 /* الأدوار الافتراضية وصلاحيات كل دور على أقسام النظام */
 export function seedRoles() {
   return {
-    "مدير النظام": allPerms(true),
+    "مدير النظام": { ...allPerms(true), "attendance-register": false },
     "مرشد طلابي": {
       ...allPerms(true),
       settings: false,
@@ -215,6 +216,7 @@ export function seedRoles() {
       ...allPerms(false),
       dashboard: true,
       attendance: true,
+      "attendance-register": true,
       violations: true,
       evaluation: true,
       "lesson-points": true,

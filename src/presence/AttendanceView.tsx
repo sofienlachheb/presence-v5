@@ -21,6 +21,7 @@ import { AttendanceLogTab } from "./AttendanceLogTab";
    الحضور والغياب — تسجيل حسب الحصة + سجلّ قابل للفلترة والطباعة
 --------------------------------------------------------------- */
 export function AttendanceView({
+  canRegister = false,
   attClass,
   setAttClass,
   attPeriod,
@@ -34,7 +35,8 @@ export function AttendanceView({
   users,
   fetchAttendanceLog,
 }) {
-  const [tab, setTab] = useState("take"); // take | log
+  const [tab, setTab] = useState(canRegister ? "take" : "log"); // take | log
+  const activeTab = canRegister ? tab : "log";
   const list = studentsByClass[attClass] || [];
   const statuses = ["حاضر", "متأخر", "غائب"];
   const statusColor = { "حاضر": "#2F9E6E", "متأخر": "#D9A62E", "غائب": "#C7433F" };
@@ -46,7 +48,7 @@ export function AttendanceView({
   // إعادة تهيئة المسودة عند تغيير الصف/الحصة/التاريخ
   useEffect(() => {
     setDraft({});
-  }, [attClass, attPeriod, selectedDate]);
+  }, [attClass, attPeriod, selectedDate, canRegister]);
 
   const getStatus = (studentId) => draft[studentId] ?? todaysAttendance[studentId]?.status ?? null;
   const getTime = (studentId) => todaysAttendance[studentId]?.time;
@@ -58,7 +60,7 @@ export function AttendanceView({
   const changedCount = Object.keys(draft).length;
 
   const handleSave = async () => {
-    if (!attPeriod) return;
+    if (!canRegister || !attPeriod) return;
     setSaving(true);
     const ok = await saveAttendanceBatch(attPeriod, draft);
     setSaving(false);
@@ -69,16 +71,16 @@ export function AttendanceView({
     <div className="view-stack">
       <div className="card">
         <div className="settings-tabs">
-          <button className={`settings-tab ${tab === "take" ? "settings-tab-active" : ""}`} onClick={() => setTab("take")}>
+          {canRegister && <button className={`settings-tab ${activeTab === "take" ? "settings-tab-active" : ""}`} onClick={() => setTab("take")}>
             <UserCheck size={15} /> تسجيل الحضور
-          </button>
-          <button className={`settings-tab ${tab === "log" ? "settings-tab-active" : ""}`} onClick={() => setTab("log")}>
+          </button>}
+          <button className={`settings-tab ${activeTab === "log" ? "settings-tab-active" : ""}`} onClick={() => setTab("log")}>
             <ClipboardList size={15} /> سجلّ الحضور
           </button>
         </div>
       </div>
 
-      {tab === "take" && (
+      {activeTab === "take" && (
         <>
           <div className="card">
             <div className="field-row">
@@ -157,7 +159,7 @@ export function AttendanceView({
         </>
       )}
 
-      {tab === "log" && (
+      {activeTab === "log" && (
         <AttendanceLogTab
           selectedDate={selectedDate}
           classes={classes}

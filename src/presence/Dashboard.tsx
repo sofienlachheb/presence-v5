@@ -153,7 +153,7 @@ export function Dashboard({
   const allowed = (id) => !perms || perms[id] !== false;
 
   const tasks = [
-    { id: "attendance", label: "أخذ الحضور", icon: UserCheck, bg: "#E7F5EF", color: "#2F9E6E" },
+    { id: "attendance", label: perms?.["attendance-register"] === true ? "أخذ الحضور" : "سجل الحضور", icon: UserCheck, bg: "#E7F5EF", color: "#2F9E6E" },
     { id: "violations", label: "تسجيل مخالفة", icon: Plus, bg: "#F9E4E3", color: "#C7433F" },
     { id: "hudhud", label: "رسائل هدهد", icon: Bird, bg: "#EDE7FA", color: "#8E6FCE" },
     { id: "evaluation", label: "تقييم أداء الطالب", icon: Star, bg: "#FBF3E1", color: "#D9A62E" },
