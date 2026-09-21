@@ -26,7 +26,12 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
   const [action, setAction] = useState("تنبيه شفهي للطالب");
 
   const isTeacher = currentUser?.role === "معلم";
-  const usesClassPicker = isTeacher || ["مشرف سلوكي", "مشرف"].includes(currentUser?.role);
+  const usesClassPicker = isTeacher || [
+    "مشرف سلوكي",
+    "مشرف",
+    "مرشد طلابي",
+    "منسق شؤون الطلاب",
+  ].includes(currentUser?.role);
 
   // للمعلم والمشرف: اختيار الصف أولاً، ثم الطالب من القائمة المتاحة للحساب.
   // بما أن students الممرّرة للمعلم هي accessibleStudents، فلن تظهر له صفوف خارج تكليفه.
