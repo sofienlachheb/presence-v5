@@ -22,6 +22,19 @@ export function SettingsView({ users, roles, students, addUser, updateUser, dele
   const [tab, setTab] = useState("users");
   const [userModal, setUserModal] = useState(null); // null | "new" | user object
   const [newRoleName, setNewRoleName] = useState("");
+  const [userPage, setUserPage] = useState(1);
+  const [usersPerPage, setUsersPerPage] = useState(10);
+  const userPageCount = Math.max(1, Math.ceil(users.length / usersPerPage));
+  const currentUserPage = Math.min(userPage, userPageCount);
+  const userPageStart = (currentUserPage - 1) * usersPerPage;
+  const visibleUsers = users.slice(userPageStart, userPageStart + usersPerPage);
+  const userPageNumbers = Array.from(new Set([
+    1, currentUserPage - 1, currentUserPage, currentUserPage + 1, userPageCount,
+  ])).filter((page) => page >= 1 && page <= userPageCount).sort((a, b) => a - b);
+
+  useEffect(() => {
+    setUserPage((page) => Math.min(page, userPageCount));
+  }, [userPageCount]);
 
   const roleNames = Object.keys(roles);
 
@@ -62,7 +75,7 @@ export function SettingsView({ users, roles, students, addUser, updateUser, dele
             <EmptyState text="لا يوجد مستخدمون بعد" />
           ) : (
             <ul className="mini-list">
-              {users.map((u) => (
+              {visibleUsers.map((u) => (
                 <li key={u.id}>
                   <Avatar name={u.name} tone={u.active ? "#1E2A4A" : "#9AA3AF"} />
                   <span className="mini-list-name">{u.name}</span>
@@ -85,6 +98,40 @@ export function SettingsView({ users, roles, students, addUser, updateUser, dele
                 </li>
               ))}
             </ul>
+          )}
+          {users.length > 0 && (
+            <nav className="log-pagination users-pagination" aria-label="صفحات المستخدمين" dir="rtl">
+              <span className="users-page-summary" role="status">
+                عرض {userPageStart + 1}–{Math.min(userPageStart + usersPerPage, users.length)} من {users.length} مستخدم
+              </span>
+              <label className="users-page-size">
+                لكل صفحة
+                <select className="select-input" value={usersPerPage} onChange={(event) => {
+                  setUsersPerPage(Number(event.target.value));
+                  setUserPage(1);
+                }}>
+                  {[10, 25, 50].map((size) => <option key={size} value={size}>{size}</option>)}
+                </select>
+              </label>
+              <div className="users-page-controls">
+                <button type="button" className="page-nav-btn" disabled={currentUserPage === 1} onClick={() => setUserPage(currentUserPage - 1)}>
+                  <ChevronRight size={15} /> السابق
+                </button>
+                <div className="page-numbers">
+                  {userPageNumbers.map((page, index) => (
+                    <React.Fragment key={page}>
+                      {index > 0 && page - userPageNumbers[index - 1] > 1 && <span className="page-gap" aria-hidden="true">…</span>}
+                      <button type="button" className={`page-num-btn ${page === currentUserPage ? "page-num-btn-active" : ""}`} aria-label={`الصفحة ${page}`} aria-current={page === currentUserPage ? "page" : undefined} onClick={() => setUserPage(page)}>
+                        {page}
+                      </button>
+                    </React.Fragment>
+                  ))}
+                </div>
+                <button type="button" className="page-nav-btn" disabled={currentUserPage === userPageCount} onClick={() => setUserPage(currentUserPage + 1)}>
+                  التالي <ChevronLeft size={15} />
+                </button>
+              </div>
+            </nav>
           )}
         </section>
       )}
