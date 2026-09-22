@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "../supabaseClient";
+import { createUserErrorMessage } from "./createUserError";
 import { DEFAULT_CLASSES, DEFAULT_SECTIONS, DEGREES, EVAL_CRITERIA, PERIODIC_ACADEMIC_CRITERIA, PERIODIC_BEHAVIOR_CRITERIA, PERMISSION_SECTIONS, allPerms, fmtTime, periodicRatingFromAverage, ratingFor, todayISO } from "./shared";
 import { LoginScreen } from "./LoginScreen";
 import { Header } from "./Header";
@@ -594,6 +595,14 @@ export function App() {
   };
 
 const addUser = async (data) => {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email || "").trim())) {
+    showToast("أدخل بريدًا إلكترونيًا صحيحًا");
+    return;
+  }
+  if (String(data.password || "").trim().length < 6) {
+    showToast("يجب أن تتكون كلمة المرور من 6 أحرف على الأقل");
+    return;
+  }
   try {
     const { data: result, error } = await supabase.functions.invoke(
       "create-user",
@@ -612,7 +621,7 @@ const addUser = async (data) => {
 
     if (error) {
       console.error("create-user error:", error);
-      showToast(`تعذّر إنشاء المستخدم: ${error.message}`);
+      showToast(`تعذّر إنشاء المستخدم: ${await createUserErrorMessage(error)}`);
       return;
     }
 
@@ -649,7 +658,7 @@ const addUser = async (data) => {
     );
   } catch (err) {
     console.error(err);
-    showToast("حدث خطأ أثناء إنشاء المستخدم");
+    showToast(`تعذّر إنشاء المستخدم: ${await createUserErrorMessage(err)}`);
   }
 };
   const updateUser = async (id, patch) => {
