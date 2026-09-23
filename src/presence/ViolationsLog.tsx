@@ -11,6 +11,7 @@ import {
 import { DEGREES, LOG_PAGE_SIZE, todayISO } from "./shared";
 import { EmptyState } from "./EmptyState";
 import { SeverityGauge } from "./SeverityGauge";
+import { useRecordAuthors } from "./useRecordAuthors";
 
 
 export function ViolationsLog({ violations, setMsgPreview, classes, currentUser, updateViolationFollowupStatus }) {
@@ -25,9 +26,12 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
   const [page, setPage] = useState(1);
 
   const isTeacher = currentUser?.role === "معلم";
+  const isSupervisor = currentUser?.role === "مشرف سلوكي";
+  const { names: authorNames, error: authorsError } = useRecordAuthors(isSupervisor, "violations", violations.map((v) => v.createdBy));
+  const authorName = (v) => authorNames[v.createdBy] || (v.teacherName !== "—" && v.teacherName) || "غير متاح";
   const isCounselor = currentUser?.role === "مرشد طلابي";
   const isAdmin = currentUser?.role === "مدير النظام";
-  const canUseDatePrint = isTeacher || isCounselor || isAdmin;
+  const canUseDatePrint = isTeacher || isCounselor || isAdmin || isSupervisor;
   const statuses = ["مخالفة جديدة", "تمت متابعتها", "محولة إلى الأخصائي الاجتماعي"];
 
   const filtered = violations.filter(
@@ -146,9 +150,10 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
             <td>${esc(v.item || "—")}</td>
             <td>${esc(v.period || "—")}</td>
             <td>${esc(v.action || "—")}</td>
+            ${isSupervisor ? `<td>${esc(authorName(v))}</td>` : ""}
           </tr>
         `).join("")
-      : `<tr><td colspan="8" class="center">لا توجد مخالفات مطابقة للفلاتر المحددة</td></tr>`;
+      : `<tr><td colspan="${isSupervisor ? 9 : 8}" class="center">لا توجد مخالفات مطابقة للفلاتر المحددة</td></tr>`;
 
     openPrintWindow("سجل المخالفات", `
       <div class="doc-head">
@@ -173,6 +178,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
             <th>المخالفة</th>
             <th>الحصة</th>
             <th>الإجراء</th>
+            ${isSupervisor ? "<th>سجّل المخالفة</th>" : ""}
           </tr>
         </thead>
         <tbody>${rowsHtml}</tbody>
@@ -245,6 +251,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
           </div>
         </div>
 
+        {authorsError && <p role="alert">{authorsError}</p>}
         {filtered.length === 0 ? <EmptyState text="لا توجد مخالفات مطابقة" /> : (
           <>
             <div className="log-list">
@@ -259,6 +266,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
                     </div>
                     <div className="log-item">{v.item}</div>
                     <div className="log-desc">{v.description}</div>
+                    {isSupervisor && <div className="log-desc"><b>سجّل المخالفة:</b> {authorName(v)}</div>}
                     <div className="log-bottom">
                       <span className="log-action">الإجراء: {v.action}</span>
                       {v.notified && <button className="notified-chip" onClick={() => setMsgPreview(v)}><Bell size={13} /> تم إبلاغ ولي الأمر <Eye size={13} /></button>}

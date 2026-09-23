@@ -1,5 +1,6 @@
 import { writeSchoolPrint } from "./schoolPrint";
 import { supabase } from "../supabaseClient";
+import { useRecordAuthors } from "./useRecordAuthors";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -29,6 +30,8 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
   const [teachersLoading, setTeachersLoading] = useState(false);
   const [teachersError, setTeachersError] = useState("");
   const [teachersRefresh, setTeachersRefresh] = useState(0);
+  const { names: authorNames, error: authorsError } = useRecordAuthors(canFilterTeachers, "attendance", rows.map((row) => row.createdBy));
+  const authorName = (row) => authorNames[row.createdBy] || teachers.find((teacher) => teacher.id === row.createdBy)?.name || (row.teacherName !== "—" && row.teacherName) || "غير متاح";
 
   const teachers = useMemo(
     () => (teacherOptions ?? users.filter((u) => u.role === "معلم")).slice().sort((a, b) => a.name.localeCompare(b.name, "ar")),
@@ -102,7 +105,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
           <td>${esc(r.period)}</td>
           <td>${esc(r.status)}</td>
           <td>${esc(r.time)}</td>
-          <td>${esc(r.teacherName)}</td>
+          <td>${esc(authorName(r))}</td>
         </tr>`
       )
       .join("");
@@ -156,8 +159,6 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
           <select
             aria-label="المعلم الذي سجّل الحضور"
             className="select-input"
-            size={Math.min(7, Math.max(2, teachers.length + 1))}
-            style={{ height: "auto", minHeight: 100 }}
             value={teacherId}
             onChange={(e) => {
               setTeacherId(e.target.value);
@@ -198,6 +199,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
       </div>
 
       {!loading && !error && <p>{teacherName} — عدد السجلات: {rows.length} — حالات الغياب: {absentCount}</p>}
+      {authorsError && <p role="alert">{authorsError}</p>}
       {error ? <div role="alert">{error}</div> : rows.length === 0 ? (
         <EmptyState text={loading ? "جارٍ التحميل..." : "لا توجد سجلات مطابقة"} />
       ) : (
@@ -211,7 +213,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
                 <th>الحصة</th>
                 <th>الحالة</th>
                 <th>الوقت</th>
-                <th>سجّله</th>
+                <th>سجّل الحضور / الغياب</th>
               </tr>
             </thead>
             <tbody>
@@ -225,7 +227,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
                     <span className="count-chip" style={{ background: statusColor[r.status], margin: 0 }}>{r.status}</span>
                   </td>
                   <td>{r.time}</td>
-                  <td>{r.teacherName}</td>
+                  <td>{authorName(r)}</td>
                 </tr>
               ))}
             </tbody>

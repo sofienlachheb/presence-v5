@@ -1661,6 +1661,7 @@ const addUser = async (data) => {
       class: r.students?.class_name, section: r.students?.section_name,
       date: r.date, period: r.period, status: r.status, time: r.time,
       teacherName: r.profiles?.name || "—",
+      createdBy: r.created_by,
     }));
 
     // عند المعلم: سجل الحضور يعرض فقط طلاب الصفوف المسندة إليه.
@@ -1721,6 +1722,7 @@ const addUser = async (data) => {
       followedAt: data.followed_at || null,
       referredAt: data.referred_at || null,
       createdBy: data.created_by,
+      teacherName: currentUser?.name || "—",
     },
     students
   );
