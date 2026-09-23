@@ -18,7 +18,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
   const [date, setDate] = useState(selectedDate);
   const [className, setClassName] = useState("الكل");
   const [teacherId, setTeacherId] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState(canFilterTeachers ? "غائب" : "");
   const [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
   const [studentName, setStudentName] = useState("");
@@ -128,10 +128,21 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
         </div>
         {canFilterTeachers && <div>
           <div className="field-label" style={{ marginTop: 0 }}>المعلم الذي سجّل الحضور</div>
-          <select aria-label="المعلم الذي سجّل الحضور" className="select-input" value={teacherId} onChange={(e) => setTeacherId(e.target.value)}>
+          <select
+            aria-label="المعلم الذي سجّل الحضور"
+            className="select-input"
+            size={Math.min(7, Math.max(2, teachers.length + 1))}
+            style={{ height: "auto", minHeight: 100 }}
+            value={teacherId}
+            onChange={(e) => {
+              setTeacherId(e.target.value);
+              setStatus("غائب");
+            }}
+          >
             <option value="">كل المعلمين</option>
             {teachers.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
           </select>
+          {teachers.length === 0 && <p role="status">لم تُحمّل أسماء المعلمين. يرجى تحديث الصفحة والتحقق من صلاحية عرض المعلمين.</p>}
         </div>}
         <div>
           <div className="field-label" style={{ marginTop: 0 }}>الحالة</div>
