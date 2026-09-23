@@ -266,7 +266,10 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
                     </div>
                     <div className="log-item">{v.item}</div>
                     <div className="log-desc">{v.description}</div>
-                    {isSupervisor && <div className="log-desc"><b>سجّل المخالفة:</b> {authorName(v)}</div>}
+                    {isSupervisor && <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "8px 12px", borderRadius: 8, background: "#f7eef1", color: "#713047", fontWeight: 700 }}>
+                      <UserCheck size={16} aria-hidden="true" />
+                      <span>مسجّل المخالفة: {authorName(v)}</span>
+                    </div>}
                     <div className="log-bottom">
                       <span className="log-action">الإجراء: {v.action}</span>
                       {v.notified && <button className="notified-chip" onClick={() => setMsgPreview(v)}><Bell size={13} /> تم إبلاغ ولي الأمر <Eye size={13} /></button>}

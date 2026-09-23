@@ -17,6 +17,7 @@ import { StatCard } from "./StatCard";
 import { EmptyState } from "./EmptyState";
 import { Avatar } from "./Avatar";
 import { SeverityGauge } from "./SeverityGauge";
+import { useRecordAuthors } from "./useRecordAuthors";
 
 
 /* ---------------------------------------------------------------
@@ -39,6 +40,13 @@ export function Dashboard({
   currentUser,
 }) {
   const isAdmin = currentUser?.role === "مدير النظام";
+  const isSupervisor = currentUser?.role === "مشرف سلوكي";
+  const { names: violationAuthors, error: violationAuthorsError } = useRecordAuthors(
+    isSupervisor && perms?.log === true,
+    "violations",
+    stats.todayViol.slice(0, 5).map((v) => v.createdBy)
+  );
+  const violationAuthorName = (v) => violationAuthors[v.createdBy] || (v.teacherName !== "—" && v.teacherName) || "غير متاح";
 
   const topStudents = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -1072,6 +1080,7 @@ export function Dashboard({
               </div>
             ))}
           </div>
+          {violationAuthorsError && <p role="alert">{violationAuthorsError}</p>}
           {stats.todayViol.length === 0 ? (
             <EmptyState text="لا توجد مخالفات مسجلة اليوم" />
           ) : (
@@ -1080,7 +1089,12 @@ export function Dashboard({
                 <li key={v.id}>
                   <SeverityGauge degree={v.degree} size="sm" />
                   <span className="mini-list-name">{v.studentName}</span>
-                  <span className="mini-list-desc">{v.item}</span>
+                  <span className="mini-list-desc">
+                    {v.item}
+                    {isSupervisor && <span style={{ display: "block", marginTop: 5, fontWeight: 700, color: "#713047" }}>
+                      مسجّل المخالفة: {violationAuthorName(v)}
+                    </span>}
+                  </span>
                   <span className="mini-list-time">{v.time}</span>
                 </li>
               ))}
