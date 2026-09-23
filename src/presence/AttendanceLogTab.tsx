@@ -1,4 +1,5 @@
 import { writeSchoolPrint } from "./schoolPrint";
+import { supabase } from "../supabaseClient";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Users, UserCheck, UserX, Clock, AlertTriangle, BarChart3, Bell,
@@ -24,11 +25,35 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
   const [studentName, setStudentName] = useState("");
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [teacherOptions, setTeacherOptions] = useState(null);
+  const [teachersLoading, setTeachersLoading] = useState(false);
+  const [teachersError, setTeachersError] = useState("");
+  const [teachersRefresh, setTeachersRefresh] = useState(0);
 
   const teachers = useMemo(
-    () => users.filter((u) => u.role === "معلم").slice().sort((a, b) => a.name.localeCompare(b.name, "ar")),
-    [users]
+    () => (teacherOptions ?? users.filter((u) => u.role === "معلم")).slice().sort((a, b) => a.name.localeCompare(b.name, "ar")),
+    [users, teacherOptions]
   );
+
+  useEffect(() => {
+    if (!canFilterTeachers) return;
+    let cancelled = false;
+    setTeachersLoading(true);
+    setTeachersError("");
+    const loadTeachers = async () => {
+      try {
+        const { data, error } = await supabase.rpc("get_attendance_teachers");
+        if (error) throw error;
+        if (!cancelled) setTeacherOptions(data || []);
+      } catch {
+        if (!cancelled) setTeachersError("تعذّر جلب قائمة المعلمين. يجب تفعيل خدمة قائمة المعلمين للمشرف في قاعدة البيانات أو إعادة المحاولة.");
+      } finally {
+        if (!cancelled) setTeachersLoading(false);
+      }
+    };
+    loadTeachers();
+    return () => { cancelled = true; };
+  }, [canFilterTeachers, teachersRefresh]);
 
   useEffect(() => {
     setDate(selectedDate);
@@ -142,7 +167,12 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
             <option value="">كل المعلمين</option>
             {teachers.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
           </select>
-          {teachers.length === 0 && <p role="status">لم تُحمّل أسماء المعلمين. يرجى تحديث الصفحة والتحقق من صلاحية عرض المعلمين.</p>}
+          {teachersLoading && <p role="status">جارٍ تحميل أسماء المعلمين...</p>}
+          {!teachersLoading && teachersError && <div role="alert">
+            <p>{teachersError}</p>
+            <button className="chip-btn-outline" onClick={() => setTeachersRefresh((value) => value + 1)}>إعادة المحاولة</button>
+          </div>}
+          {!teachersLoading && !teachersError && teachers.length === 0 && <p role="status">لا يوجد معلمون مسجلون.</p>}
         </div>}
         <div>
           <div className="field-label" style={{ marginTop: 0 }}>الحالة</div>
