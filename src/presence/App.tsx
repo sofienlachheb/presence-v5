@@ -651,6 +651,12 @@ const addUser = async (data) => {
 
     setUsers((prev) => [newUser, ...prev]);
 
+    if (result.restored) {
+      await loadAllData(currentUserId);
+      showToast(result.warning || result.message || "تمت استعادة المستخدم؛ كلمة المرور القديمة ما زالت سارية");
+      return;
+    }
+
     showToast(
       data.role === "ولي أمر"
         ? `تم إنشاء حساب ولي الأمر ${data.name} وربطه بالأبناء`
@@ -1627,17 +1633,23 @@ const addUser = async (data) => {
     return true;
   };
 
-  const fetchAttendanceLog = async ({ date, className, teacherName, studentName }) => {
+  const fetchAttendanceLog = useCallback(async ({ date, className, teacherId, studentName, status }) => {
     let query = supabase
       .from("attendance")
       .select("*, students!inner(name, class_name, section_name), profiles(name)")
-      .order("date", { ascending: false });
+      .order("date", { ascending: false })
+      .order("id", { ascending: true });
     if (date) query = query.eq("date", date);
     if (className && className !== "الكل") query = query.eq("students.class_name", className);
-    const { data, error } = await query;
-    if (error) {
-      showToast("تعذّر جلب سجلّ الحضور");
-      return [];
+    if (teacherId) query = query.eq("created_by", teacherId);
+    if (status) query = query.eq("status", status);
+    const data = [];
+    const pageSize = 500;
+    for (let offset = 0; ; offset += pageSize) {
+      const { data: page, error } = await query.range(offset, offset + pageSize - 1);
+      if (error) throw error;
+      data.push(...(page || []));
+      if (!page || page.length < pageSize) break;
     }
     let rows = (data || []).map((r) => ({
       id: r.id, studentId: r.student_id, studentName: r.students?.name,
@@ -1653,9 +1665,8 @@ const addUser = async (data) => {
     }
 
     if (studentName) rows = rows.filter((r) => r.studentName?.includes(studentName));
-    if (teacherName && teacherName !== "الكل") rows = rows.filter((r) => r.teacherName === teacherName);
     return rows;
-  };
+  }, [currentUser?.role, accessibleStudents]);
 
  const addViolation = async (studentId, degree, item, period, description, action) => {
   const st = students.find((s) => s.id === studentId);

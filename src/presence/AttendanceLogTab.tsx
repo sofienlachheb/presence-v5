@@ -17,27 +17,43 @@ import { EmptyState } from "./EmptyState";
 export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendanceLog }) {
   const [date, setDate] = useState(selectedDate);
   const [className, setClassName] = useState("الكل");
-  const [teacherName, setTeacherName] = useState("الكل");
+  const [teacherId, setTeacherId] = useState("");
+  const [status, setStatus] = useState("");
+  const [error, setError] = useState("");
+  const [refresh, setRefresh] = useState(0);
   const [studentName, setStudentName] = useState("");
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const teacherNames = useMemo(
-    () => (Array.from(new Set(users.map((u) => u.name))) as string[]).sort((a, b) => a.localeCompare(b, "ar")),
+  const teachers = useMemo(
+    () => users.filter((u) => u.role === "معلم").slice().sort((a, b) => a.name.localeCompare(b.name, "ar")),
     [users]
   );
 
-  const runSearch = async () => {
-    setLoading(true);
-    const result = await fetchAttendanceLog({ date, className, teacherName, studentName: studentName.trim() });
-    setRows(result);
-    setLoading(false);
-  };
+  useEffect(() => {
+    setDate(selectedDate);
+  }, [selectedDate]);
 
   useEffect(() => {
-    runSearch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let cancelled = false;
+    setLoading(true);
+    setError("");
+    setRows([]);
+    const timer = window.setTimeout(async () => {
+      try {
+        const result = await fetchAttendanceLog({ date, className, teacherId, status, studentName: studentName.trim() });
+        if (!cancelled) setRows(result);
+      } catch {
+        if (!cancelled) setError("تعذّر تحميل سجلّ الحضور. أعد المحاولة.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }, 250);
+    return () => { cancelled = true; window.clearTimeout(timer); };
+  }, [date, className, teacherId, status, studentName, refresh, fetchAttendanceLog]);
+
+  const teacherName = teachers.find((teacher) => teacher.id === teacherId)?.name || "كل المعلمين";
+  const absentCount = rows.filter((row) => row.status === "غائب").length;
 
   const esc = (v) =>
     String(v ?? "")
@@ -52,11 +68,11 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
   const printAttendanceLog = () => {
     const w = window.open("", "_blank", "width=980,height=760");
     if (!w) return;
-    const title = `سجلّ الحضور — ${esc(date)}`;
+    const title = `سجلّ الحضور — ${esc(date || "كل التواريخ")}`;
     const bodyRows = rows
       .map(
         (r) => `<tr>
-          <td>${esc(r.studentName)}</td>
+          <td>${esc(r.date)}</td><td>${esc(r.studentName)}</td>
           <td>${esc(r.class)} / ${esc(r.section)}</td>
           <td>${esc(r.period)}</td>
           <td>${esc(r.status)}</td>
@@ -79,9 +95,9 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
         @media print{.no-print{display:none!important}}
       </style></head><body><div class="sheet">
         <h1>سجلّ الحضور والغياب</h1>
-        <div class="sub">التاريخ: ${esc(date)} — عدد السجلات: ${rows.length}</div>
+        <div class="sub">التاريخ: ${esc(date || "كل التواريخ")} — المعلم: ${esc(teacherName)} — الحالة: ${esc(status || "كل الحالات")} — عدد السجلات: ${rows.length} — حالات الغياب: ${absentCount}</div>
         <table>
-          <thead><tr><th>الطالب</th><th>الصف/الشعبة</th><th>الحصة</th><th>الحالة</th><th>الوقت</th><th>سجّله</th></tr></thead>
+          <thead><tr><th>التاريخ</th><th>الطالب</th><th>الصف/الشعبة</th><th>الحصة</th><th>الحالة</th><th>الوقت</th><th>سجّله</th></tr></thead>
           <tbody>${bodyRows}</tbody>
         </table>
       </div></body></html>`);
@@ -92,7 +108,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
     <div className="card">
       <div className="card-head">
         <h3><ClipboardList size={17} /> سجلّ الحضور ({rows.length})</h3>
-        <button className="chip-btn-outline" onClick={printAttendanceLog} disabled={rows.length === 0}>
+        <button className="chip-btn-outline" onClick={printAttendanceLog} disabled={loading || rows.length === 0}>
           <Printer size={14} /> طباعة
         </button>
       </div>
@@ -101,6 +117,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
         <div>
           <div className="field-label" style={{ marginTop: 0 }}>التاريخ</div>
           <input type="date" className="text-input" value={date} onChange={(e) => setDate(e.target.value)} />
+          <button className="chip-btn-outline" onClick={() => setDate("")} disabled={!date}>كل التواريخ</button>
         </div>
         <div>
           <div className="field-label" style={{ marginTop: 0 }}>الصف</div>
@@ -110,10 +127,19 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
           </select>
         </div>
         <div>
-          <div className="field-label" style={{ marginTop: 0 }}>المدرّس</div>
-          <select className="select-input" value={teacherName} onChange={(e) => setTeacherName(e.target.value)}>
-            <option value="الكل">الكل</option>
-            {teacherNames.map((n) => <option key={n} value={n}>{n}</option>)}
+          <div className="field-label" style={{ marginTop: 0 }}>المعلم الذي سجّل الحضور</div>
+          <select aria-label="المعلم الذي سجّل الحضور" className="select-input" value={teacherId} onChange={(e) => setTeacherId(e.target.value)}>
+            <option value="">كل المعلمين</option>
+            {teachers.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <div className="field-label" style={{ marginTop: 0 }}>الحالة</div>
+          <select aria-label="حالة الحضور" className="select-input" value={status} onChange={(e) => setStatus(e.target.value)}>
+            <option value="">كل الحالات</option>
+            <option value="غائب">الغياب فقط</option>
+            <option value="حاضر">حاضر</option>
+            <option value="متأخر">متأخر</option>
           </select>
         </div>
         <div>
@@ -125,18 +151,20 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
             onChange={(e) => setStudentName(e.target.value)}
           />
         </div>
-        <button className="chip-btn" onClick={runSearch} disabled={loading}>
+        <button className="chip-btn" onClick={() => setRefresh((value) => value + 1)} disabled={loading}>
           <Search size={14} /> {loading ? "جارٍ البحث..." : "بحث"}
         </button>
       </div>
 
-      {rows.length === 0 ? (
+      {!loading && !error && <p>{teacherName} — عدد السجلات: {rows.length} — حالات الغياب: {absentCount}</p>}
+      {error ? <div role="alert">{error}</div> : rows.length === 0 ? (
         <EmptyState text={loading ? "جارٍ التحميل..." : "لا توجد سجلات مطابقة"} />
       ) : (
         <div className="att-log-table-wrap">
           <table className="perm-table">
             <thead>
               <tr>
+                <th>التاريخ</th>
                 <th>الطالب</th>
                 <th>الصف/الشعبة</th>
                 <th>الحصة</th>
@@ -148,6 +176,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
             <tbody>
               {rows.map((r) => (
                 <tr key={r.id}>
+                  <td>{r.date}</td>
                   <td className="perm-section-label">{r.studentName}</td>
                   <td>{r.class} / {r.section}</td>
                   <td>{r.period}</td>
