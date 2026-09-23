@@ -21,6 +21,7 @@ import { AttendanceLogTab } from "./AttendanceLogTab";
    الحضور والغياب — تسجيل حسب الحصة + سجلّ قابل للفلترة والطباعة
 --------------------------------------------------------------- */
 export function AttendanceView({
+  canFilterTeachers = false,
   canRegister = false,
   attClass,
   setAttClass,
@@ -161,6 +162,7 @@ export function AttendanceView({
 
       {activeTab === "log" && (
         <AttendanceLogTab
+          canFilterTeachers={canFilterTeachers}
           selectedDate={selectedDate}
           classes={classes}
           users={users}

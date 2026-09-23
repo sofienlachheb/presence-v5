@@ -14,7 +14,7 @@ import { EmptyState } from "./EmptyState";
 /* ---------------------------------------------------------------
    تبويب سجلّ الحضور — فلترة حسب التاريخ / الصف / المعلّم / اسم الطالب
 --------------------------------------------------------------- */
-export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendanceLog }) {
+export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendanceLog, canFilterTeachers = false }) {
   const [date, setDate] = useState(selectedDate);
   const [className, setClassName] = useState("الكل");
   const [teacherId, setTeacherId] = useState("");
@@ -41,7 +41,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
     setRows([]);
     const timer = window.setTimeout(async () => {
       try {
-        const result = await fetchAttendanceLog({ date, className, teacherId, status, studentName: studentName.trim() });
+        const result = await fetchAttendanceLog({ date, className, teacherId: canFilterTeachers ? teacherId : "", status, studentName: studentName.trim() });
         if (!cancelled) setRows(result);
       } catch {
         if (!cancelled) setError("تعذّر تحميل سجلّ الحضور. أعد المحاولة.");
@@ -50,9 +50,9 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
       }
     }, 250);
     return () => { cancelled = true; window.clearTimeout(timer); };
-  }, [date, className, teacherId, status, studentName, refresh, fetchAttendanceLog]);
+  }, [date, className, teacherId, status, studentName, refresh, fetchAttendanceLog, canFilterTeachers]);
 
-  const teacherName = teachers.find((teacher) => teacher.id === teacherId)?.name || "كل المعلمين";
+  const teacherName = canFilterTeachers ? teachers.find((teacher) => teacher.id === teacherId)?.name || "كل المعلمين" : "سجلّ الحضور للصفوف المتاحة";
   const absentCount = rows.filter((row) => row.status === "غائب").length;
 
   const esc = (v) =>
@@ -95,7 +95,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
         @media print{.no-print{display:none!important}}
       </style></head><body><div class="sheet">
         <h1>سجلّ الحضور والغياب</h1>
-        <div class="sub">التاريخ: ${esc(date || "كل التواريخ")} — المعلم: ${esc(teacherName)} — الحالة: ${esc(status || "كل الحالات")} — عدد السجلات: ${rows.length} — حالات الغياب: ${absentCount}</div>
+        <div class="sub">التاريخ: ${esc(date || "كل التواريخ")} — ${esc(teacherName)} — الحالة: ${esc(status || "كل الحالات")} — عدد السجلات: ${rows.length} — حالات الغياب: ${absentCount}</div>
         <table>
           <thead><tr><th>التاريخ</th><th>الطالب</th><th>الصف/الشعبة</th><th>الحصة</th><th>الحالة</th><th>الوقت</th><th>سجّله</th></tr></thead>
           <tbody>${bodyRows}</tbody>
@@ -126,13 +126,13 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
             {classes.map((c) => <option key={c} value={c}>الصف {c}</option>)}
           </select>
         </div>
-        <div>
+        {canFilterTeachers && <div>
           <div className="field-label" style={{ marginTop: 0 }}>المعلم الذي سجّل الحضور</div>
           <select aria-label="المعلم الذي سجّل الحضور" className="select-input" value={teacherId} onChange={(e) => setTeacherId(e.target.value)}>
             <option value="">كل المعلمين</option>
             {teachers.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
           </select>
-        </div>
+        </div>}
         <div>
           <div className="field-label" style={{ marginTop: 0 }}>الحالة</div>
           <select aria-label="حالة الحضور" className="select-input" value={status} onChange={(e) => setStatus(e.target.value)}>
