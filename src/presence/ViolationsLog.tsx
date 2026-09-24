@@ -17,6 +17,7 @@ import { useRecordAuthors } from "./useRecordAuthors";
 export function ViolationsLog({ violations, setMsgPreview, classes, currentUser, updateViolationFollowupStatus }) {
   const [filterDegree, setFilterDegree] = useState(0);
   const [filterClass, setFilterClass] = useState("الكل");
+  const [filterTeacher, setFilterTeacher] = useState("");
   const [filterStatus, setFilterStatus] = useState("الكل");
   const [filterDate, setFilterDate] = useState(
     ["معلم", "مرشد طلابي", "مدير النظام"].includes(currentUser?.role)
@@ -29,6 +30,17 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
   const isSupervisor = currentUser?.role === "مشرف سلوكي";
   const { names: authorNames, error: authorsError } = useRecordAuthors(isSupervisor, "violations", violations.map((v) => v.createdBy));
   const authorName = (v) => authorNames[v.createdBy] || (v.teacherName !== "—" && v.teacherName) || "غير متاح";
+  const teacherKey = (v) => v.createdBy ? `id:${v.createdBy}` : `name:${v.teacherName || "—"}`;
+  const teachers = useMemo(() => {
+    const options = new Map<string, string>();
+    violations.forEach((v) => {
+      const key = teacherKey(v);
+      const name = authorName(v);
+      if (!options.has(key) || options.get(key) === "غير متاح") options.set(key, name);
+    });
+    return Array.from(options, ([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name, "ar"));
+  }, [violations, authorNames]);
   const isCounselor = currentUser?.role === "مرشد طلابي";
   const isAdmin = currentUser?.role === "مدير النظام";
   const canUseDatePrint = isTeacher || isCounselor || isAdmin || isSupervisor;
@@ -38,6 +50,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
     (v) =>
       (filterDegree === 0 || v.degree === filterDegree) &&
       (filterClass === "الكل" || v.class === filterClass) &&
+      (!isSupervisor || !filterTeacher || teacherKey(v) === filterTeacher) &&
       (!filterDate || v.date === filterDate) &&
       (filterStatus === "الكل" || (v.followupStatus || "مخالفة جديدة") === filterStatus)
   );
@@ -45,7 +58,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
   // إعادة الصفحة إلى ١ كلما تغيّرت الفلاتر أو تغيّر عدد المخالفات
   useEffect(() => {
     setPage(1);
-  }, [filterDegree, filterClass, filterStatus, filterDate, violations.length]);
+  }, [filterDegree, filterClass, filterTeacher, filterStatus, filterDate, violations.length]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / LOG_PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -164,6 +177,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
           <span>${dateTitle}</span>
           <span>${classTitle}</span>
           <span>${degreeTitle}</span>
+          ${isSupervisor ? `<span>${esc(teachers.find((teacher) => teacher.id === filterTeacher)?.name || "كل المعلمين")}</span>` : ""}
         </div>
       </div>
 
@@ -205,6 +219,18 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
               <option value="الكل">كل الصفوف</option>
               {classes.map((c) => <option key={c} value={c}>الصف {c}</option>)}
             </select>
+
+            {isSupervisor && (
+              <select
+                className="select-input select-inline"
+                aria-label="فلترة المخالفات حسب المعلم"
+                value={filterTeacher}
+                onChange={(e) => setFilterTeacher(e.target.value)}
+              >
+                <option value="">كل المعلمين</option>
+                {teachers.map((teacher) => <option key={teacher.id} value={teacher.id}>{teacher.name}</option>)}
+              </select>
+            )}
 
             {canUseDatePrint && (
               <>
