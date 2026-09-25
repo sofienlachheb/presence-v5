@@ -13,6 +13,7 @@ import { Avatar } from "./Avatar";
 import { PERMISSION_SECTIONS } from "./shared";
 import { PeriodManager } from "./PeriodManager";
 import { UserModal } from "./UserModal";
+import { UserImportModal } from "./UserImportModal";
 
 
 /* ---------------------------------------------------------------
@@ -21,6 +22,7 @@ import { UserModal } from "./UserModal";
 export function SettingsView({ users, roles, students, addUser, updateUser, deleteUser, togglePermission, addRole, deleteRole, resetUserPassword, periods, addPeriod, deletePeriod, classes, sections }) {
   const [tab, setTab] = useState("users");
   const [userModal, setUserModal] = useState(null); // null | "new" | user object
+  const [importOpen, setImportOpen] = useState(false);
   const [newRoleName, setNewRoleName] = useState("");
   const [userPage, setUserPage] = useState(1);
   const [usersPerPage, setUsersPerPage] = useState(10);
@@ -67,6 +69,7 @@ export function SettingsView({ users, roles, students, addUser, updateUser, dele
         <section className="card">
           <div className="card-head">
             <h3><Users size={17} /> إدارة المستخدمين ({users.length})</h3>
+            <button className="chip-btn-outline" onClick={() => setImportOpen(true)}>استيراد مستخدمين من Excel</button>
             <button className="chip-btn" onClick={() => setUserModal("new")}>
               <UserPlus size={15} /> إضافة مستخدم
             </button>
@@ -215,6 +218,7 @@ export function SettingsView({ users, roles, students, addUser, updateUser, dele
         </section>
       )}
 
+      {importOpen && <UserImportModal users={users} roles={roleNames} classes={classes || []} sections={sections || []} students={students || []} addUser={addUser} onClose={() => setImportOpen(false)} />}
       {userModal && (
         <UserModal
           user={userModal === "new" ? null : userModal}
