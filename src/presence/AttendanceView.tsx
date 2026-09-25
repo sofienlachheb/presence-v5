@@ -57,6 +57,11 @@ export function AttendanceView({
     setDraft((prev) => ({ ...prev, [studentId]: status }));
   };
 
+  const setAllDraftStatuses = (status) => {
+    if (!canRegister || !attPeriod || saving || list.length === 0) return;
+    setDraft(Object.fromEntries(list.map((student) => [student.id, status])));
+  };
+
   const changedCount = Object.keys(draft).length;
 
   const handleSave = async () => {
@@ -119,6 +124,21 @@ export function AttendanceView({
               <EmptyState text="يرجى اختيار الحصة أولاً قبل بدء التحضير" />
             ) : (
               <>
+                <div role="group" aria-label="تحديد حالة جميع طلاب الصف" style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+                  {["حاضر", "غائب", "متأخر"].map((status) => (
+                    <button
+                      key={status}
+                      type="button"
+                      className="chip-btn-outline"
+                      style={{ color: statusColor[status], borderColor: statusColor[status] }}
+                      disabled={saving || list.length === 0}
+                      onClick={() => setAllDraftStatuses(status)}
+                    >
+                      {status} للكل
+                    </button>
+                  ))}
+                </div>
+                <p style={{ margin: "0 0 12px", fontSize: 12 }}>تُطبّق على طلاب الصف المعروض للحصة المحددة. يمكنك تعديل حالة أي طالب قبل الحفظ.</p>
                 <div className="att-table">
                   {list.map((s) => {
                     const status = getStatus(s.id);
@@ -135,6 +155,7 @@ export function AttendanceView({
                           {statuses.map((st) => (
                             <button
                               key={st}
+                              disabled={saving}
                               className={`status-btn ${status === st ? "status-btn-active" : ""}`}
                               style={status === st ? { background: statusColor[st], borderColor: statusColor[st] } : {}}
                               onClick={() => setDraftStatus(s.id, st)}
@@ -151,7 +172,7 @@ export function AttendanceView({
                 </div>
 
                 <button className="submit-btn" disabled={changedCount === 0 || saving} onClick={handleSave}>
-                  <Save size={16} /> {saving ? "جارٍ الحفظ..." : `حفظ الغياب${changedCount ? ` (${changedCount} تغييراً)` : ""}`}
+                  <Save size={16} /> {saving ? "جارٍ الحفظ..." : `حفظ الحضور والغياب${changedCount ? ` (${changedCount} تغييراً)` : ""}`}
                 </button>
               </>
             )}
