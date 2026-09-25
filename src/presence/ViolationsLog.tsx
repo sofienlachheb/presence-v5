@@ -28,7 +28,8 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
 
   const isTeacher = currentUser?.role === "معلم";
   const isSupervisor = currentUser?.role === "مشرف سلوكي";
-  const { names: authorNames, error: authorsError } = useRecordAuthors(isSupervisor, "violations", violations.map((v) => v.createdBy));
+  const canFilterTeachers = isSupervisor || currentUser?.role === "مدير النظام";
+  const { names: authorNames, error: authorsError } = useRecordAuthors(canFilterTeachers, "violations", violations.map((v) => v.createdBy));
   const authorName = (v) => authorNames[v.createdBy] || (v.teacherName !== "—" && v.teacherName) || "غير متاح";
   const teacherKey = (v) => v.createdBy ? `id:${v.createdBy}` : `name:${v.teacherName || "—"}`;
   const teachers = useMemo(() => {
@@ -50,7 +51,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
     (v) =>
       (filterDegree === 0 || v.degree === filterDegree) &&
       (filterClass === "الكل" || v.class === filterClass) &&
-      (!isSupervisor || !filterTeacher || teacherKey(v) === filterTeacher) &&
+      (!canFilterTeachers || !filterTeacher || teacherKey(v) === filterTeacher) &&
       (!filterDate || v.date === filterDate) &&
       (filterStatus === "الكل" || (v.followupStatus || "مخالفة جديدة") === filterStatus)
   );
@@ -163,10 +164,10 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
             <td>${esc(v.item || "—")}</td>
             <td>${esc(v.period || "—")}</td>
             <td>${esc(v.action || "—")}</td>
-            ${isSupervisor ? `<td>${esc(authorName(v))}</td>` : ""}
+            ${canFilterTeachers ? `<td>${esc(authorName(v))}</td>` : ""}
           </tr>
         `).join("")
-      : `<tr><td colspan="${isSupervisor ? 9 : 8}" class="center">لا توجد مخالفات مطابقة للفلاتر المحددة</td></tr>`;
+      : `<tr><td colspan="${canFilterTeachers ? 9 : 8}" class="center">لا توجد مخالفات مطابقة للفلاتر المحددة</td></tr>`;
 
     openPrintWindow("سجل المخالفات", `
       <div class="doc-head">
@@ -177,7 +178,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
           <span>${dateTitle}</span>
           <span>${classTitle}</span>
           <span>${degreeTitle}</span>
-          ${isSupervisor ? `<span>${esc(teachers.find((teacher) => teacher.id === filterTeacher)?.name || "كل المعلمين")}</span>` : ""}
+          ${canFilterTeachers ? `<span>${esc(teachers.find((teacher) => teacher.id === filterTeacher)?.name || "كل المعلمين")}</span>` : ""}
         </div>
       </div>
 
@@ -192,7 +193,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
             <th>المخالفة</th>
             <th>الحصة</th>
             <th>الإجراء</th>
-            ${isSupervisor ? "<th>سجّل المخالفة</th>" : ""}
+            ${canFilterTeachers ? "<th>سجّل المخالفة</th>" : ""}
           </tr>
         </thead>
         <tbody>${rowsHtml}</tbody>
@@ -220,7 +221,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
               {classes.map((c) => <option key={c} value={c}>الصف {c}</option>)}
             </select>
 
-            {isSupervisor && (
+            {canFilterTeachers && (
               <select
                 className="select-input select-inline"
                 aria-label="فلترة المخالفات حسب المعلم"
@@ -292,7 +293,7 @@ export function ViolationsLog({ violations, setMsgPreview, classes, currentUser,
                     </div>
                     <div className="log-item">{v.item}</div>
                     <div className="log-desc">{v.description}</div>
-                    {isSupervisor && <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "8px 12px", borderRadius: 8, background: "#f7eef1", color: "#713047", fontWeight: 700 }}>
+                    {canFilterTeachers && <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 10, padding: "8px 12px", borderRadius: 8, background: "#f7eef1", color: "#713047", fontWeight: 700 }}>
                       <UserCheck size={16} aria-hidden="true" />
                       <span>مسجّل المخالفة: {authorName(v)}</span>
                     </div>}
