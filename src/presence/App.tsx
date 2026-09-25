@@ -1641,7 +1641,7 @@ const addUser = async (data) => {
       .order("id", { ascending: true });
     if (date) query = query.eq("date", date);
     if (className && className !== "الكل") query = query.eq("students.class_name", className);
-    if (teacherId && currentUser?.role === "مشرف سلوكي") query = query.eq("created_by", teacherId);
+    if (teacherId && ["مشرف سلوكي", "مدير النظام"].includes(currentUser?.role)) query = query.eq("created_by", teacherId);
     if (currentUser?.role === "معلم") {
       const studentIds = accessibleStudents.map((student) => student.id);
       if (!studentIds.length) return [];
@@ -1832,7 +1832,7 @@ const addUser = async (data) => {
           )}
           {view === "attendance" && (
             <AttendanceView
-              canFilterTeachers={currentUser?.role === "مشرف سلوكي"}
+              canFilterTeachers={["مشرف سلوكي", "مدير النظام"].includes(currentUser?.role)}
               canRegister={currentPerms.attendance !== false && currentPerms["attendance-register"] === true}
               attClass={attClass}
               setAttClass={setAttClass}

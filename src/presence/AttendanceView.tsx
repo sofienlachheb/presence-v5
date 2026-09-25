@@ -37,7 +37,6 @@ export function AttendanceView({
   fetchAttendanceLog,
 }) {
   const [tab, setTab] = useState(canRegister ? "take" : "log"); // take | log
-  const activeTab = canRegister ? tab : "log";
   const list = studentsByClass[attClass] || [];
   const statuses = ["حاضر", "متأخر", "غائب"];
   const statusColor = { "حاضر": "#2F9E6E", "متأخر": "#D9A62E", "غائب": "#C7433F" };
@@ -49,54 +48,45 @@ export function AttendanceView({
   // إعادة تهيئة المسودة عند تغيير الصف/الحصة/التاريخ
   useEffect(() => {
     setDraft({});
-  }, [attClass, attPeriod, selectedDate, canRegister]);
+  }, [attClass, attPeriod, selectedDate]);
 
   const getStatus = (studentId) => draft[studentId] ?? todaysAttendance[studentId]?.status ?? null;
   const getTime = (studentId) => todaysAttendance[studentId]?.time;
 
   const setDraftStatus = (studentId, status) => {
-    if (!canRegister || !attPeriod || saving) return;
     setDraft((prev) => ({ ...prev, [studentId]: status }));
-  };
-
-  const setAllStatuses = (status) => {
-    if (!canRegister || !attPeriod || saving || !list.length) return;
-    setDraft(Object.fromEntries(list.map((student) => [student.id, status])));
   };
 
   const changedCount = Object.keys(draft).length;
 
   const handleSave = async () => {
-    if (!canRegister || !attPeriod || saving || !changedCount) return;
+    if (!canRegister || !attPeriod) return;
     setSaving(true);
-    try {
-      const ok = await saveAttendanceBatch(attPeriod, draft);
-      if (ok) setDraft({});
-    } finally {
-      setSaving(false);
-    }
+    const ok = await saveAttendanceBatch(attPeriod, draft);
+    setSaving(false);
+    if (ok) setDraft({});
   };
 
   return (
     <div className="view-stack">
       <div className="card">
         <div className="settings-tabs">
-          {canRegister && <button className={`settings-tab ${activeTab === "take" ? "settings-tab-active" : ""}`} onClick={() => setTab("take")}>
+          {canRegister && <button className={`settings-tab ${tab === "take" ? "settings-tab-active" : ""}`} onClick={() => setTab("take")}>
             <UserCheck size={15} /> تسجيل الحضور
           </button>}
-          <button className={`settings-tab ${activeTab === "log" ? "settings-tab-active" : ""}`} onClick={() => setTab("log")}>
+          <button className={`settings-tab ${tab === "log" ? "settings-tab-active" : ""}`} onClick={() => setTab("log")}>
             <ClipboardList size={15} /> سجلّ الحضور
           </button>
         </div>
       </div>
 
-      {activeTab === "take" && (
+      {canRegister && tab === "take" && (
         <>
           <div className="card">
             <div className="field-row">
               <div style={{ flex: 1 }}>
                 <div className="field-label" style={{ marginTop: 0 }}>الحصة</div>
-                <select className="select-input" value={attPeriod} disabled={saving} onChange={(e) => setAttPeriod(e.target.value)}>
+                <select className="select-input" value={attPeriod} onChange={(e) => setAttPeriod(e.target.value)}>
                   <option value="">-- اختر الحصة --</option>
                   {periods.map((p) => (
                     <option key={p.id} value={p.name}>{p.name}</option>
@@ -110,7 +100,6 @@ export function AttendanceView({
             {Object.keys(studentsByClass).map((c) => (
               <button
                 key={c}
-                disabled={saving}
                 className={`class-tab ${attClass === c ? "class-tab-active" : ""}`}
                 onClick={() => setAttClass(c)}
               >
@@ -130,22 +119,6 @@ export function AttendanceView({
               <EmptyState text="يرجى اختيار الحصة أولاً قبل بدء التحضير" />
             ) : (
               <>
-                <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8, marginBottom: 12 }}>
-                  <span>تحديد حالة جميع الطلاب المعروضين ({list.length}):</span>
-                  {["حاضر", "غائب", "متأخر"].map((status) => (
-                    <button
-                      key={status}
-                      type="button"
-                      className="chip-btn-outline"
-                      disabled={saving || list.length === 0}
-                      onClick={() => setAllStatuses(status)}
-                      style={{ color: statusColor[status], borderColor: statusColor[status] }}
-                    >
-                      الكل {status}
-                    </button>
-                  ))}
-                </div>
-                <p style={{ fontSize: 13 }}>يمكنك تعديل حالة أي طالب بعد التحديد الجماعي، ثم الضغط على «حفظ الحضور والغياب».</p>
                 <div className="att-table">
                   {list.map((s) => {
                     const status = getStatus(s.id);
@@ -162,7 +135,6 @@ export function AttendanceView({
                           {statuses.map((st) => (
                             <button
                               key={st}
-                              disabled={saving}
                               className={`status-btn ${status === st ? "status-btn-active" : ""}`}
                               style={status === st ? { background: statusColor[st], borderColor: statusColor[st] } : {}}
                               onClick={() => setDraftStatus(s.id, st)}
@@ -179,7 +151,7 @@ export function AttendanceView({
                 </div>
 
                 <button className="submit-btn" disabled={changedCount === 0 || saving} onClick={handleSave}>
-                  <Save size={16} /> {saving ? "جارٍ الحفظ..." : `حفظ الحضور والغياب${changedCount ? ` (${changedCount} تغييراً)` : ""}`}
+                  <Save size={16} /> {saving ? "جارٍ الحفظ..." : `حفظ الغياب${changedCount ? ` (${changedCount} تغييراً)` : ""}`}
                 </button>
               </>
             )}
@@ -187,7 +159,7 @@ export function AttendanceView({
         </>
       )}
 
-      {activeTab === "log" && (
+      {(!canRegister || tab === "log") && (
         <AttendanceLogTab
           canFilterTeachers={canFilterTeachers}
           selectedDate={selectedDate}

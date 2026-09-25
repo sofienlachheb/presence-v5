@@ -49,7 +49,7 @@ export function AttendanceLogTab({ selectedDate, classes, users, fetchAttendance
         if (error) throw error;
         if (!cancelled) setTeacherOptions(data || []);
       } catch {
-        if (!cancelled) setTeachersError("تعذّر جلب قائمة المعلمين. يجب تفعيل خدمة قائمة المعلمين للمشرف في قاعدة البيانات أو إعادة المحاولة.");
+        if (!cancelled) setTeachersError("تعذّر جلب قائمة المعلمين. يجب تفعيل خدمة قائمة المعلمين في قاعدة البيانات أو إعادة المحاولة.");
       } finally {
         if (!cancelled) setTeachersLoading(false);
       }
