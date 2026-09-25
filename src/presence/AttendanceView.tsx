@@ -23,6 +23,7 @@ import { AttendanceLogTab } from "./AttendanceLogTab";
 export function AttendanceView({
   canFilterTeachers = false,
   canRegister = false,
+  chooseClassFirst = false,
   attClass,
   setAttClass,
   attPeriod,
@@ -37,6 +38,8 @@ export function AttendanceView({
   fetchAttendanceLog,
 }) {
   const [tab, setTab] = useState(canRegister ? "take" : "log"); // take | log
+  const [chosenClass, setChosenClass] = useState<string | null>(null);
+  const showRegistration = !chooseClassFirst || (chosenClass === attClass && Object.prototype.hasOwnProperty.call(studentsByClass, attClass));
   const list = studentsByClass[attClass] || [];
   const statuses = ["حاضر", "متأخر", "غائب"];
   const statusColor = { "حاضر": "#2F9E6E", "متأخر": "#D9A62E", "غائب": "#C7433F" };
@@ -76,7 +79,7 @@ export function AttendanceView({
     <div className="view-stack">
       <div className="card">
         <div className="settings-tabs">
-          {canRegister && <button className={`settings-tab ${tab === "take" ? "settings-tab-active" : ""}`} onClick={() => setTab("take")}>
+          {canRegister && <button className={`settings-tab ${tab === "take" ? "settings-tab-active" : ""}`} onClick={() => { if (tab !== "take") setChosenClass(null); setTab("take"); }}>
             <UserCheck size={15} /> تسجيل الحضور
           </button>}
           <button className={`settings-tab ${tab === "log" ? "settings-tab-active" : ""}`} onClick={() => setTab("log")}>
@@ -87,6 +90,22 @@ export function AttendanceView({
 
       {canRegister && tab === "take" && (
         <>
+          <div className="class-tabs">
+            {Object.keys(studentsByClass).map((c) => (
+              <button
+                key={c}
+                className={`class-tab ${showRegistration && attClass === c ? "class-tab-active" : ""}`}
+                onClick={() => { if (attClass !== c || !showRegistration) setDraft({}); setAttClass(c); setChosenClass(c); }}
+              >
+                {c.includes("||")
+                  ? `الصف ${c.split("||")[0]} / شعبة ${c.split("||")[1]}`
+                  : `الصف ${c}`}
+              </button>
+            ))}
+          </div>
+
+          {showRegistration && (
+            <>
           <div className="card">
             <div className="field-row">
               <div style={{ flex: 1 }}>
@@ -99,20 +118,6 @@ export function AttendanceView({
                 </select>
               </div>
             </div>
-          </div>
-
-          <div className="class-tabs">
-            {Object.keys(studentsByClass).map((c) => (
-              <button
-                key={c}
-                className={`class-tab ${attClass === c ? "class-tab-active" : ""}`}
-                onClick={() => setAttClass(c)}
-              >
-                {c.includes("||")
-                  ? `الصف ${c.split("||")[0]} / شعبة ${c.split("||")[1]}`
-                  : `الصف ${c}`}
-              </button>
-            ))}
           </div>
 
           <div className="card">
@@ -177,6 +182,8 @@ export function AttendanceView({
               </>
             )}
           </div>
+            </>
+          )}
         </>
       )}
 

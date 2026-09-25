@@ -1832,6 +1832,7 @@ const addUser = async (data) => {
           )}
           {view === "attendance" && (
             <AttendanceView
+              chooseClassFirst={currentUser?.role === "مشرف سلوكي"}
               canFilterTeachers={["مشرف سلوكي", "مدير النظام"].includes(currentUser?.role)}
               canRegister={currentPerms.attendance !== false && currentPerms["attendance-register"] === true}
               attClass={attClass}
