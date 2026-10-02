@@ -6,6 +6,7 @@ import { LoginScreen } from "./LoginScreen";
 import { Header } from "./Header";
 import { SideNav } from "./SideNav";
 import { Dashboard } from "./Dashboard";
+import { SupervisorWorkbook } from "./SupervisorWorkbook";
 import { AttendanceView } from "./AttendanceView";
 import { ViolationsEntry } from "./ViolationsEntry";
 import { ViolationsLog } from "./ViolationsLog";
@@ -594,14 +595,17 @@ export function App() {
     return true;
   };
 
-const addUser = async (data) => {
+const addUser = async (data, options = { quiet: false }) => {
+  let accountCreated = false;
+  let message = "";
+  const notify = (text) => { message = text; if (!options.quiet) showToast(text); };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(data.email || "").trim())) {
-    showToast("أدخل بريدًا إلكترونيًا صحيحًا");
-    return;
+    notify("أدخل بريدًا إلكترونيًا صحيحًا");
+    return { success: accountCreated, message };
   }
   if (String(data.password || "").trim().length < 6) {
-    showToast("يجب أن تتكون كلمة المرور من 6 أحرف على الأقل");
-    return;
+    notify("يجب أن تتكون كلمة المرور من 6 أحرف على الأقل");
+    return { success: accountCreated, message };
   }
   try {
     const { data: result, error } = await supabase.functions.invoke(
@@ -621,20 +625,21 @@ const addUser = async (data) => {
 
     if (error) {
       console.error("create-user error:", error);
-      showToast(`تعذّر إنشاء المستخدم: ${await createUserErrorMessage(error)}`);
-      return;
+      notify(`تعذّر إنشاء المستخدم: ${await createUserErrorMessage(error)}`);
+      return { success: accountCreated, message };
     }
 
     if (!result?.success) {
-      showToast(result?.error || "تعذّر إنشاء المستخدم");
-      return;
+      notify(result?.error || "تعذّر إنشاء المستخدم");
+      return { success: accountCreated, message };
     }
 
+    accountCreated = true;
     if (data.role === "معلم") {
       const { error: subjectError } = await supabase.from("profiles").update({ teaching_subject: data.teachingSubject.trim() }).eq("id", result.user.id);
-      if (subjectError) { showToast("تم إنشاء الحساب، لكن تعذّر حفظ المادة. حدّدها من تعديل المستخدم بعد تطبيق ترحيل المرحلة 23."); await loadAllData(currentUserId); return; }
+      if (subjectError) { notify("تم إنشاء الحساب، لكن تعذّر حفظ المادة. حدّدها من تعديل المستخدم بعد تطبيق ترحيل المرحلة 23."); await loadAllData(currentUserId); return { success: accountCreated, message }; }
       const ok = await syncTeacherClasses(result.user.id, data.teachingAssignments || []);
-      if (!ok) return;
+      if (!ok) { notify("تم إنشاء الحساب، لكن تعذّر حفظ الصفوف. راجع تعديل المستخدم."); await loadAllData(currentUserId); return { success: true, message }; }
     }
 
     const newUser = {
@@ -653,19 +658,20 @@ const addUser = async (data) => {
 
     if (result.restored) {
       await loadAllData(currentUserId);
-      showToast(result.warning || result.message || "تمت استعادة المستخدم؛ كلمة المرور القديمة ما زالت سارية");
-      return;
+      notify(result.warning || result.message || "تمت استعادة المستخدم؛ كلمة المرور القديمة ما زالت سارية");
+      return { success: accountCreated, message };
     }
 
-    showToast(
+    notify(
       data.role === "ولي أمر"
         ? `تم إنشاء حساب ولي الأمر ${data.name} وربطه بالأبناء`
         : `تم إنشاء المستخدم ${data.name}`
     );
   } catch (err) {
     console.error(err);
-    showToast(`تعذّر إنشاء المستخدم: ${await createUserErrorMessage(err)}`);
+    notify(accountCreated ? "تم إنشاء الحساب، لكن تعذّر إكمال بياناته. راجع قائمة المستخدمين قبل إعادة الاستيراد." : `تعذّر إنشاء المستخدم: ${await createUserErrorMessage(err)}`);
   }
+  return { success: accountCreated, message };
 };
   const updateUser = async (id, patch) => {
     const { error } = await supabase
@@ -1812,6 +1818,11 @@ const addUser = async (data) => {
       <div className="app-body">
         <SideNav view={view} setView={setView} pendingCount={stats.absent} perms={currentPerms} currentUser={currentUser} />
         <main className="main-area">
+          {view === "dashboard" && currentUser?.role === "مشرف سلوكي" && currentPerms.dashboard === true && (
+            <SupervisorWorkbook key={currentUser.id} students={accessibleStudents} periods={periods}
+              violations={violationLogItems} selectedDate={selectedDate} currentUser={currentUser}
+              perms={currentPerms} fetchAttendanceLog={fetchAttendanceLog} setView={setView} />
+          )}
           {view === "dashboard" && (
             <Dashboard
               stats={stats}
