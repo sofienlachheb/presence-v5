@@ -1639,13 +1639,15 @@ const addUser = async (data, options = { quiet: false }) => {
     return true;
   };
 
-  const fetchAttendanceLog = useCallback(async ({ date, className, teacherId, studentName, status }) => {
+  const fetchAttendanceLog = useCallback(async ({ date, className, teacherId, studentName, status, dateFrom = "", dateTo = "" }) => {
     let query = supabase
       .from("attendance")
       .select("*, students!inner(name, class_name, section_name), profiles(name)")
       .order("date", { ascending: false })
       .order("id", { ascending: true });
     if (date) query = query.eq("date", date);
+    if (dateFrom) query = query.gte("date", dateFrom);
+    if (dateTo) query = query.lte("date", dateTo);
     if (className && className !== "الكل") query = query.eq("students.class_name", className);
     if (teacherId && ["مشرف سلوكي", "مدير النظام"].includes(currentUser?.role)) query = query.eq("created_by", teacherId);
     if (currentUser?.role === "معلم") {
@@ -1818,7 +1820,7 @@ const addUser = async (data, options = { quiet: false }) => {
       <div className="app-body">
         <SideNav view={view} setView={setView} pendingCount={stats.absent} perms={currentPerms} currentUser={currentUser} />
         <main className="main-area">
-          {view === "dashboard" && currentUser?.role === "مشرف سلوكي" && currentPerms.dashboard === true && (
+          {view === "dashboard" && ["مشرف سلوكي", "مدير النظام"].includes(currentUser?.role) && currentPerms.dashboard === true && (
             <SupervisorWorkbook key={currentUser.id} students={accessibleStudents} periods={periods}
               violations={violationLogItems} selectedDate={selectedDate} currentUser={currentUser}
               perms={currentPerms} fetchAttendanceLog={fetchAttendanceLog} setView={setView} />

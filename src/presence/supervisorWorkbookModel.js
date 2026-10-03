@@ -52,3 +52,23 @@ export function studentMessage(row, date) {
     `حالة الطالب: ${row.status}`, `حصص الحضور: ${row.present} — حصص الغياب المسجلة: ${row.absent}`,
   ].join("\n");
 }
+
+export function workbookDateRange(mode, date, month) {
+  if (mode === "all") return { from: "", to: "" };
+  if (mode === "month") {
+    const [year, m] = month.split("-").map(Number);
+    const last = new Date(Date.UTC(year, m, 0)).getUTCDate();
+    return { from: `${month}-01`, to: `${month}-${last}` };
+  }
+  return { from: date, to: date };
+}
+
+export function buildWorkbookRangeRows(students, periods, attendance, notes, violations, range) {
+  const inRange = (date) => date && (!range.from || date >= range.from) && (!range.to || date <= range.to);
+  const dates = range.from && range.from === range.to ? [range.from] :
+    [...new Set([...attendance, ...notes, ...violations].map((r) => String(r.date || "").slice(0, 10)).filter(inRange))].sort().reverse();
+  return dates.flatMap((date) => buildWorkbookRows(students, periods,
+    attendance.filter((r) => String(r.date).slice(0, 10) === date),
+    notes.filter((r) => String(r.date).slice(0, 10) === date), violations, date)
+    .map((row) => ({ ...row, date })));
+}

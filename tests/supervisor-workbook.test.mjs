@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildWorkbookRows, absentWorkbookRows, attendanceStatistics, studentMessage, classKey } from '../src/presence/supervisorWorkbookModel.js';
+import { buildWorkbookRows, buildWorkbookRangeRows, workbookDateRange, absentWorkbookRows, attendanceStatistics, studentMessage, classKey } from '../src/presence/supervisorWorkbookModel.js';
 const student = { id: 's1', name: 'طالب تجريبي', class: '10', section: '1', guardianPhone: '123' };
 const periods = Array.from({ length: 7 }, (_, i) => `حصة ${i + 1}`);
 const date = '2026-10-04';
@@ -58,4 +58,30 @@ test('absence list excludes unrecorded, late and excused lessons without recorde
   assert.deepEqual(absentWorkbookRows(rows(['حاضر', 'متأخر', 'معذور'])), []);
   assert.deepEqual(absentWorkbookRows(rows(Array(7).fill('معذور'))), []);
   assert.deepEqual(absentWorkbookRows([]), []);
+});
+
+test('date ranges cover the selected day, leap month, year end and all dates', () => {
+  assert.deepEqual(workbookDateRange('day', date, ''), { from: date, to: date });
+  assert.deepEqual(workbookDateRange('month', date, '2024-02'), { from: '2024-02-01', to: '2024-02-29' });
+  assert.equal(workbookDateRange('month', date, '2026-12').to, '2026-12-31');
+  assert.deepEqual(workbookDateRange('all', date, ''), { from: '', to: '' });
+});
+
+test('multi-day rows keep attendance and behavior separate for each date', () => {
+  const attendance = [
+    { studentId: student.id, period: periods[0], status: 'غائب', date: '2026-10-01' },
+    { studentId: student.id, period: periods[0], status: 'حاضر', date: '2026-10-02' },
+    { studentId: student.id, period: periods[0], status: 'غائب', date: '2026-09-30' },
+  ];
+  const notes = [{ student_id: student.id, period: periods[0], behavior: 'متميز', date: '2026-10-01' }];
+  const result = buildWorkbookRangeRows([student], periods, attendance, notes, [], workbookDateRange('month', date, '2026-10'));
+  assert.deepEqual(result.map(r => r.date), ['2026-10-02', '2026-10-01']);
+  assert.equal(result[0].present, 1);
+  assert.equal(result[0].behaviorCount, 0);
+  assert.equal(result[1].absent, 1);
+  assert.equal(result[1].behaviorCount, 1);
+  assert.equal(absentWorkbookRows(result).length, 1);
+  assert.equal(buildWorkbookRangeRows([student], periods, attendance, [], [], { from: '', to: '' }).length, 3);
+  assert.equal(buildWorkbookRangeRows([student], periods, [], [], [], { from: '', to: '' }).length, 0);
+  assert.equal(buildWorkbookRangeRows([student], periods, [], [], [], { from: date, to: date })[0].status, 'لم يسجل');
 });
