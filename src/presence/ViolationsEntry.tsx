@@ -64,7 +64,7 @@ export function ViolationsEntry({ studentsByClass = {}, violStudent, setViolStud
     reset();
   };
 
-  const canSubmit = degree && item && description.trim().length >= 15;
+  const canSubmit = degree && item;
 
   return (
     <div className="view-stack">
@@ -180,15 +180,14 @@ export function ViolationsEntry({ studentsByClass = {}, violStudent, setViolStud
                     </div>
                   </div>
 
-                  <div className="field-label">وصف الواقعة (٥٠ حرفاً على الأقل)</div>
+                  <div className="field-label">وصف الواقعة (اختياري)</div>
                   <textarea
                     className="textarea-input"
                     rows={4}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="اكتب تفاصيل ما حدث بدقة..."
+                    placeholder="يمكنك كتابة تفاصيل ما حدث أو ترك الوصف فارغًا..."
                   />
-                  <div className="char-hint">{description.length} / 50 حرف كحد أدنى</div>
 
                   <button
                     className="submit-btn"
