@@ -290,7 +290,7 @@ export function seedStudents() {
 export const todayISO = () => new Date().toISOString().slice(0, 10);
 
 export const fmtDate = (iso) =>
-  new Date(iso).toLocaleDateString("ar-QA", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+  new Date(iso).toLocaleDateString("ar-QA", { numberingSystem: "latn", weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
 export const fmtTime = () => {
   const now = new Date();
