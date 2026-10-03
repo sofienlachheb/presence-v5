@@ -17,7 +17,7 @@ import { ClassTabs } from "./ClassTabs";
 /* ---------------------------------------------------------------
    تسجيل مخالفة
 --------------------------------------------------------------- */
-export function ViolationsEntry({ students, studentsByClass = {}, violStudent, setViolStudent, addViolation, periods, currentUser }) {
+export function ViolationsEntry({ studentsByClass = {}, violStudent, setViolStudent, addViolation, periods, currentUser }) {
   const [search, setSearch] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [degree, setDegree] = useState(null);
@@ -27,36 +27,9 @@ export function ViolationsEntry({ students, studentsByClass = {}, violStudent, s
   const [action, setAction] = useState("تنبيه شفهي للطالب");
 
   const isTeacher = currentUser?.role === "معلم";
-  const isSupervisor = ["مشرف سلوكي", "مشرف"].includes(currentUser?.role);
-  const usesClassPicker = isTeacher || [
-    "مشرف سلوكي",
-    "مشرف",
-    "مرشد طلابي",
-    "منسق شؤون الطلاب",
-  ].includes(currentUser?.role);
-
-  // للمعلم والمشرف: اختيار الصف أولاً، ثم الطالب من القائمة المتاحة للحساب.
-  // بما أن students الممرّرة للمعلم هي accessibleStudents، فلن تظهر له صفوف خارج تكليفه.
-  const availableClasses = useMemo(
-    () => isSupervisor ? Object.keys(studentsByClass) :
-      [...new Set<string>(
-        (students || [])
-          .map((s) => String(s.class || "").trim())
-          .filter(Boolean)
-      )],
-    [students, studentsByClass, isSupervisor]
-  );
-
-  // بعد اختيار الصف، نعرض طلابه المتاحين للمستخدم،
-  // حتى لو كانوا موزعين على أكثر من شعبة، دون إظهار اسم الشعبة في الواجهة.
-  const classStudents = useMemo(() => {
-    if (!usesClassPicker) return students || [];
-    if (!selectedClass) return [];
-    if (isSupervisor) return studentsByClass[selectedClass] || [];
-    return (students || []).filter(
-      (s) => String(s.class || "").trim() === selectedClass
-    );
-  }, [students, usesClassPicker, selectedClass, isSupervisor, studentsByClass]);
+  // نفس صفوف وشعب تسجيل الحضور، وفق صلاحيات الحساب.
+  const availableClasses = useMemo(() => Object.keys(studentsByClass), [studentsByClass]);
+  const classStudents = studentsByClass[selectedClass] || [];
 
   const filtered = classStudents.filter(
     (s) =>
@@ -65,17 +38,11 @@ export function ViolationsEntry({ students, studentsByClass = {}, violStudent, s
   );
 
   useEffect(() => {
-    if (!usesClassPicker) return;
-
-    if (isTeacher && availableClasses.length === 1 && !selectedClass) {
-      setSelectedClass(availableClasses[0]);
-    }
-
-    if (selectedClass && !availableClasses.includes(selectedClass)) {
-      setSelectedClass("");
+    if (!availableClasses.includes(selectedClass)) {
+      setSelectedClass(availableClasses[0] || "");
       setViolStudent(null);
     }
-  }, [usesClassPicker, isTeacher, availableClasses, selectedClass, setViolStudent]);
+  }, [availableClasses, selectedClass, setViolStudent]);
 
   const reset = () => {
     setDegree(null);
@@ -101,46 +68,21 @@ export function ViolationsEntry({ students, studentsByClass = {}, violStudent, s
 
   return (
     <div className="view-stack">
-      {isSupervisor && (
-        <ClassTabs classes={availableClasses} selectedClass={selectedClass} onSelect={chooseClass} />
+      <ClassTabs classes={availableClasses} selectedClass={selectedClass} onSelect={chooseClass} />
+      {availableClasses.length === 0 && (
+        <EmptyState text={isTeacher ? "لم يتم إسناد أي صف لهذا المعلم بعد" : "لا توجد صفوف متاحة"} />
       )}
-      {(!isSupervisor || availableClasses.includes(selectedClass)) && (
+      {availableClasses.includes(selectedClass) && (
       <div className="two-col two-col-narrow">
         <section className="card">
           <div className="card-head">
             <h3>
               <Search size={17} />
-              {usesClassPicker && !isSupervisor ? "اختيار الصف ثم الطالب" : "اختيار الطالب"}
+              اختيار الطالب
             </h3>
           </div>
 
-          {usesClassPicker && !isSupervisor && (
-            <>
-              <div className="field-label" style={{ marginTop: 0 }}>١. اختر الصف</div>
-
-              {availableClasses.length === 0 ? (
-                <EmptyState text={isTeacher ? "لم يتم إسناد أي صف لهذا المعلم بعد" : "لا توجد صفوف بها طلاب"} />
-              ) : (
-                <div className="class-tabs" style={{ marginBottom: 14 }}>
-                  {availableClasses.map((cls) => (
-                    <button
-                      key={cls}
-                      className={`class-tab ${selectedClass === cls ? "class-tab-active" : ""}`}
-                      onClick={() => chooseClass(cls)}
-                    >
-                      الصف {cls}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </>
-          )}
-
-          {(!usesClassPicker || selectedClass) && (
-            <>
-              <div className="field-label" style={{ marginTop: usesClassPicker ? 4 : 0 }}>
-                {isSupervisor ? "اختر الطالب" : usesClassPicker ? "٢. اختر الطالب" : "الطالب"}
-              </div>
+              <div className="field-label" style={{ marginTop: 0 }}>اختر الطالب</div>
 
               <div className="search-box">
                 <Search size={16} />
@@ -154,11 +96,7 @@ export function ViolationsEntry({ students, studentsByClass = {}, violStudent, s
               <div className="student-pick-list">
                 {filtered.length === 0 ? (
                   <EmptyState
-                    text={
-                      usesClassPicker
-                        ? "لا يوجد طلاب مطابقون في الصف المحدد"
-                        : "لا يوجد طلاب مطابقون"
-                    }
+                    text="لا يوجد طلاب مطابقون في الصف المحدد"
                   />
                 ) : (
                   filtered.map((s) => (
@@ -170,24 +108,18 @@ export function ViolationsEntry({ students, studentsByClass = {}, violStudent, s
                       <Avatar name={s.name} />
                       <div>
                         <div className="att-name">{s.name}</div>
-                        <div className="att-sub">الصف {s.class}</div>
+                        <div className="att-sub">الصف {s.class}{isTeacher ? ` / شعبة ${s.section}` : ""}</div>
                       </div>
                     </button>
                   ))
                 )}
               </div>
-            </>
-          )}
         </section>
 
         <section className="card">
-          {!violStudent || (usesClassPicker && (!selectedClass || String(violStudent.class || "").trim() !== selectedClass)) ? (
+          {!violStudent || !classStudents.some((student) => student.id === violStudent.id) ? (
             <EmptyState
-              text={
-                usesClassPicker && !selectedClass
-                  ? "اختر الصف أولاً ثم اختر الطالب لتسجيل المخالفة"
-                  : "اختر طالباً من القائمة لبدء تسجيل المخالفة"
-              }
+              text="اختر طالباً من القائمة لبدء تسجيل المخالفة"
             />
           ) : (
             <>
@@ -198,7 +130,7 @@ export function ViolationsEntry({ students, studentsByClass = {}, violStudent, s
               </div>
 
               <div className="att-sub" style={{ marginBottom: 10 }}>
-                الصف {violStudent.class}
+                الصف {violStudent.class}{isTeacher ? ` / شعبة ${violStudent.section}` : ""}
               </div>
 
               <div className="field-label">١. اختر درجة المخالفة</div>
