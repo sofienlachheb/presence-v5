@@ -12,6 +12,7 @@ import { EmptyState } from "./EmptyState";
 import { Avatar } from "./Avatar";
 import { HealthDot } from "./HealthDot";
 import { AttendanceLogTab } from "./AttendanceLogTab";
+import { ClassTabs } from "./ClassTabs";
 
 
 /* ---------------------------------------------------------------
@@ -90,19 +91,11 @@ export function AttendanceView({
 
       {canRegister && tab === "take" && (
         <>
-          <div className="class-tabs">
-            {Object.keys(studentsByClass).map((c) => (
-              <button
-                key={c}
-                className={`class-tab ${showRegistration && attClass === c ? "class-tab-active" : ""}`}
-                onClick={() => { if (attClass !== c || !showRegistration) setDraft({}); setAttClass(c); setChosenClass(c); }}
-              >
-                {c.includes("||")
-                  ? `الصف ${c.split("||")[0]} / شعبة ${c.split("||")[1]}`
-                  : `الصف ${c}`}
-              </button>
-            ))}
-          </div>
+          <ClassTabs
+            classes={Object.keys(studentsByClass)}
+            selectedClass={showRegistration ? attClass : null}
+            onSelect={(c) => { if (attClass !== c || !showRegistration) setDraft({}); setAttClass(c); setChosenClass(c); }}
+          />
 
           {showRegistration && (
             <>

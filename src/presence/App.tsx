@@ -1862,6 +1862,7 @@ const addUser = async (data, options = { quiet: false }) => {
           )}
           {view === "violations" && (
             <ViolationsEntry
+              studentsByClass={studentsByClass}
               students={currentUser?.role === "معلم" ? accessibleStudents : students}
               violStudent={violStudent}
               setViolStudent={setViolStudent}

@@ -11,12 +11,13 @@ import { EmptyState } from "./EmptyState";
 import { Avatar } from "./Avatar";
 import { ACTIONS_LIST, DEGREES } from "./shared";
 import { SeverityGauge } from "./SeverityGauge";
+import { ClassTabs } from "./ClassTabs";
 
 
 /* ---------------------------------------------------------------
    تسجيل مخالفة
 --------------------------------------------------------------- */
-export function ViolationsEntry({ students, violStudent, setViolStudent, addViolation, periods, currentUser }) {
+export function ViolationsEntry({ students, studentsByClass = {}, violStudent, setViolStudent, addViolation, periods, currentUser }) {
   const [search, setSearch] = useState("");
   const [selectedClass, setSelectedClass] = useState("");
   const [degree, setDegree] = useState(null);
@@ -26,6 +27,7 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
   const [action, setAction] = useState("تنبيه شفهي للطالب");
 
   const isTeacher = currentUser?.role === "معلم";
+  const isSupervisor = ["مشرف سلوكي", "مشرف"].includes(currentUser?.role);
   const usesClassPicker = isTeacher || [
     "مشرف سلوكي",
     "مشرف",
@@ -36,13 +38,13 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
   // للمعلم والمشرف: اختيار الصف أولاً، ثم الطالب من القائمة المتاحة للحساب.
   // بما أن students الممرّرة للمعلم هي accessibleStudents، فلن تظهر له صفوف خارج تكليفه.
   const availableClasses = useMemo(
-    () =>
+    () => isSupervisor ? Object.keys(studentsByClass) :
       [...new Set<string>(
         (students || [])
           .map((s) => String(s.class || "").trim())
           .filter(Boolean)
       )],
-    [students]
+    [students, studentsByClass, isSupervisor]
   );
 
   // بعد اختيار الصف، نعرض طلابه المتاحين للمستخدم،
@@ -50,10 +52,11 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
   const classStudents = useMemo(() => {
     if (!usesClassPicker) return students || [];
     if (!selectedClass) return [];
+    if (isSupervisor) return studentsByClass[selectedClass] || [];
     return (students || []).filter(
       (s) => String(s.class || "").trim() === selectedClass
     );
-  }, [students, usesClassPicker, selectedClass]);
+  }, [students, usesClassPicker, selectedClass, isSupervisor, studentsByClass]);
 
   const filtered = classStudents.filter(
     (s) =>
@@ -98,16 +101,20 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
 
   return (
     <div className="view-stack">
+      {isSupervisor && (
+        <ClassTabs classes={availableClasses} selectedClass={selectedClass} onSelect={chooseClass} />
+      )}
+      {(!isSupervisor || availableClasses.includes(selectedClass)) && (
       <div className="two-col two-col-narrow">
         <section className="card">
           <div className="card-head">
             <h3>
               <Search size={17} />
-              {usesClassPicker ? "اختيار الصف ثم الطالب" : "اختيار الطالب"}
+              {usesClassPicker && !isSupervisor ? "اختيار الصف ثم الطالب" : "اختيار الطالب"}
             </h3>
           </div>
 
-          {usesClassPicker && (
+          {usesClassPicker && !isSupervisor && (
             <>
               <div className="field-label" style={{ marginTop: 0 }}>١. اختر الصف</div>
 
@@ -132,7 +139,7 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
           {(!usesClassPicker || selectedClass) && (
             <>
               <div className="field-label" style={{ marginTop: usesClassPicker ? 4 : 0 }}>
-                {usesClassPicker ? "٢. اختر الطالب" : "الطالب"}
+                {isSupervisor ? "اختر الطالب" : usesClassPicker ? "٢. اختر الطالب" : "الطالب"}
               </div>
 
               <div className="search-box">
@@ -264,6 +271,7 @@ export function ViolationsEntry({ students, violStudent, setViolStudent, addViol
           )}
         </section>
       </div>
+      )}
     </div>
   );
 }
