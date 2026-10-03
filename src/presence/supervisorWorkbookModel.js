@@ -30,6 +30,11 @@ export function buildWorkbookRows(students, periods, attendance, notes, violatio
   });
 }
 
+// Follow up recorded absences immediately, independently of the daily threshold.
+export function absentWorkbookRows(rows) {
+  return rows.filter((row) => row.absent > 0);
+}
+
 export function attendanceStatistics(rows, periods) {
   return periods.map((period, index) => {
     const count = (status) => rows.filter((r) => r.cells[index]?.status === status).length;

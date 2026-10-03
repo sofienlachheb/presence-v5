@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildWorkbookRows, attendanceStatistics, studentMessage, classKey } from '../src/presence/supervisorWorkbookModel.js';
+import { buildWorkbookRows, absentWorkbookRows, attendanceStatistics, studentMessage, classKey } from '../src/presence/supervisorWorkbookModel.js';
 const student = { id: 's1', name: 'طالب تجريبي', class: '10', section: '1', guardianPhone: '123' };
 const periods = Array.from({ length: 7 }, (_, i) => `حصة ${i + 1}`);
 const date = '2026-10-04';
@@ -42,4 +42,20 @@ test('messages preserve unrecorded status and do not assert delivery', () => {
 });
 test('class keys cannot collide on separator characters', () => {
   assert.notEqual(classKey({ class: 'a/b', section: 'c' }), classKey({ class: 'a', section: 'b/c' }));
+});
+
+test('absence list includes partial days and daily-present students with recorded absence', () => {
+  const partial = rows(['غائب'])[0];
+  assert.equal(partial.status, 'غير مكتمل');
+  assert.deepEqual(absentWorkbookRows([partial]), [partial]);
+  const present = rows(['حاضر', 'حاضر', 'حاضر', 'حاضر', 'حاضر', 'غائب'])[0];
+  assert.equal(present.status, 'حاضر');
+  assert.deepEqual(absentWorkbookRows([present]), [present]);
+});
+
+test('absence list excludes unrecorded, late and excused lessons without recorded absence', () => {
+  assert.deepEqual(absentWorkbookRows(rows([])), []);
+  assert.deepEqual(absentWorkbookRows(rows(['حاضر', 'متأخر', 'معذور'])), []);
+  assert.deepEqual(absentWorkbookRows(rows(Array(7).fill('معذور'))), []);
+  assert.deepEqual(absentWorkbookRows([]), []);
 });
