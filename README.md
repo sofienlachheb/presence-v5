@@ -76,9 +76,4 @@ Create a photorealistic editorial architectural photograph for an Arabic seconda
 
 ```powershell
 supabase login
-supabase functions deploy update-user-password --project-ref YOUR_PROJECT_REF
-```
 
-الدالة موجودة في `supabase/functions/update-user-password` وتستخدم متغيري الخادم الافتراضيين `SUPABASE_URL` و`SUPABASE_SERVICE_ROLE_KEY`. لا تضع مفتاح الخدمة في متغيرات Vite أو ملفات الواجهة. تتحقق الدالة من جلسة المستدعي ودوره وحالة حسابه من جدول profiles قبل تغيير كلمة المرور عبر Auth Admin. مرجع الواجهة: https://supabase.com/docs/reference/javascript/auth-admin-updateuserbyid
-
-الاختبارات المحلية: `node --test tests/update-user-password.test.mjs` ثم `npm run build`. لم تُنشر الدالة أو تُغيّر كلمة مرور حساب حي أثناء التطوير؛ أداة Supabase تحتاج تسجيل الدخول. بعد النشر، اختبر بحساب تجريبي تغيير كلمة المرور ثم الدخول بالجديدة ورفض القديمة.
