@@ -10,6 +10,7 @@ export default defineConfig({
           react: ["react", "react-dom"],
           charts: ["recharts"],
           icons: ["lucide-react"],
+         base: '/presence-v5/',
         },
       },
     },
